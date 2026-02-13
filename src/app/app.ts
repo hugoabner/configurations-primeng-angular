@@ -10,4 +10,13 @@ import { ButtonModule } from 'primeng/button';
 })
 export class App {
   protected readonly title = signal('control-de-procesos');
+
+  constructor() {
+    // server log
+    console.log('Inicializando la aplicación desde en servidor:', this.title());
+    // client log
+    // console.log('Inicializando la aplicación desde el cliente:', this.title());
+    // prerender log
+    // console.log('Inicializando la aplicación desde prerender:', this.title());
+  }
 }
