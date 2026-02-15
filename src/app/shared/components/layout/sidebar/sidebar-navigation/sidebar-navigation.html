@@ -1,0 +1,111 @@
+<ul class="list-none">
+  @for (item of menuItems; track $index; let i = $index) {
+    <li
+      class="relative group"
+      [ngClass]="{ 'sidebar-collapsed': !desktopOpen }"
+      (mouseenter)="!desktopOpen ? onItemMouseEnter(i, $event) : null"
+      (mouseleave)="!desktopOpen ? onItemMouseLeave() : null"
+    >
+      <!-- Item principal -->
+      <a
+        [routerLink]="item.route || null"
+        [routerLinkActive]="item.submenus?.length === 0 ? 'active' : ''"
+        [routerLinkActiveOptions]="{ exact: item.exact }"
+        (click)="navigateAndClose(item)"
+        [class.justify-center]="!desktopOpen"
+        class="flex items-center rounded-lg p-2 text-[16px] 
+        hover:bg-surface-200 dark:hover:bg-surface-700 
+        transition-colors duration-200 font-medium"
+        [class.bg-primary-500]="
+          (item.submenus?.length === 0 && isLinkActive(item.route)) ||
+          (item.submenus?.length > 0 && isSubmenuActive(item.submenus))
+        "
+        [class.text-primary-600]="
+          (item.submenus?.length === 0 && isLinkActive(item.route)) ||
+          (item.submenus?.length > 0 && isSubmenuActive(item.submenus))
+        "
+        [class.text-white]="
+          (item.submenus?.length === 0 && isLinkActive(item.route)) ||
+          (item.submenus?.length > 0 && isSubmenuActive(item.submenus))
+        "
+        
+        #menuItem
+        [pTooltip]="
+        !desktopOpen && (!item.submenus || item.submenus.length === 0) ? item.label : ''
+        "
+        >
+        <!-- [class.font-medium]="
+          (item.submenus?.length === 0 && isLinkActive(item.route)) ||
+          (item.submenus?.length > 0 && isSubmenuActive(item.submenus))
+        " -->
+        @if (item.icon) {
+          <i class="text-lg w-6 flex-shrink-0 text-center" [class]="item.icon"></i>
+        }
+        @if (desktopOpen) {
+          <span class="ml-3 truncate transition-opacity duration-200">
+            {{ item.label }}
+          </span>
+          <!-- si hay submenús mostrar flecha -->
+          @if (item.submenus && item.submenus.length > 0) {
+            <i
+              class="ml-auto text-xs fas transition-transform duration-200"
+              [class]="expandedIndex === i ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
+            ></i>
+          }
+        }
+      </a>
+
+      <!-- Submenús expandidos (sidebar abierto) -->
+      @if (desktopOpen && item.submenus && item.submenus.length > 0 && expandedIndex === i) {
+        <ul class="ml-6 mt-1 space-y-1 pl-4 border-l border-gray-200 animate-slideDown">
+          @for (child of item.submenus; track child.label) {
+            <li>
+              <a
+                [routerLink]="child.route"
+                routerLinkActive="active"
+                class="flex items-center rounded-lg p-2 text-sm text-gray-600 hover:bg-primary-100 hover:text-gray-900 transition-colors duration-200"
+              >
+                <!-- (click)="closeSubmenu()" -->
+                <span class="truncate">
+                  {{ child.label }}
+                </span>
+              </a>
+            </li>
+          }
+        </ul>
+      }
+    </li>
+  }
+</ul>
+
+<!-- Submenús flotantes fijos (como en React) -->
+@if (!desktopOpen && hoveredItem && hoveredItem.submenus && hoveredItem.submenus.length > 0) {
+  <div
+    class="fixed z-[100] hidden md:block bg-white"
+    [ngStyle]="{
+      'left.px': dropdownPosition.left,
+      'top.px': dropdownPosition.top,
+    }"
+    (mouseenter)="onDropdownMouseEnter()"
+    (mouseleave)="onDropdownMouseLeave()"
+  >
+    <div class="bg-white border border-gray-200 rounded-lg shadow-lg min-w-[180px] ml-1">
+      <div class="font-semibold px-3 py-2 text-sm border-b border-gray-200 bg-gray-50 rounded-t-lg">
+        {{ hoveredItem.label }}
+      </div>
+      <div class="space-y-1">
+        @for (subItem of hoveredItem.submenus; track subItem.label) {
+          <a
+            [routerLink]="subItem.route"
+            routerLinkActive="active"
+            class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors duration-200"
+            [class.bg-red-50]="isLinkActive(subItem.route)"
+            [class.text-red-600]="isLinkActive(subItem.route)"
+          >
+            <span>{{ subItem.label }}</span>
+          </a>
+        }
+      </div>
+    </div>
+  </div>
+}

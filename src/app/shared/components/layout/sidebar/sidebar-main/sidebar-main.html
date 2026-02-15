@@ -1,0 +1,83 @@
+<div
+  class="hidden md:block 
+  bg-surface-50 dark:bg-surface-900 
+  border-surface-200 dark:border-surface-700 border-r 
+  fixed h-full left-0 transition-all duration-400"
+  [ngClass]="desktopOpen ? 'w-60 ' : 'w-20'"
+>
+  <!-- [ngClass]="{ 'translate-x-0': desktopOpen, '-translate-x-47': !desktopOpen }" -->
+  <div class="h-full flex flex-col justify-between">
+    <section class="py-5">header1</section>
+    <!-- dar estilo al scrooll -->
+    <div class="p-3 flex-1 overflow-y-auto scroll-mr-96">
+      <!-- body -->
+      <section class="h-full">
+        <app-sidebar-navigation [menuItems]="menuItems" />
+      </section>
+    </div>
+    <section class="">footer1</section>
+  </div>
+</div>
+
+@if (mobileOpen) {
+  <div class="md:hidden fixed inset-0 z-30 flex" role="dialog" aria-modal="true">
+    <!-- backdrop -->
+    <button
+      class="absolute inset-0 bg-black/40"
+      aria-label="Close sidebar"
+      (click)="closeMobile()"
+    ></button>
+
+    <!-- panel -->
+    <aside class="relative w-72 
+    bg-surface-50 dark:bg-surface-900 
+    border-surface-200 dark:border-surface-700 border-r  
+    shadow-xl h-full transition-all duration-400"
+    [ngClass]="mobileOpen ? ' animate-fadeinleft' : 'animate-fadeinright ' "
+    >
+      <div class="h-full flex flex-col">
+        <div class="p-4 flex items-center justify-end
+        border-b border-surface-200 dark:border-surface-700 ">
+          <!-- header -->
+          <p-button
+            icon="pi pi-times"
+            size="small"
+            (click)="closeMobile()"
+          ></p-button>
+        </div>
+        <div class="p-4 flex-1 overflow-auto">
+          <!-- body -->
+          <section class="h-full">
+            <app-sidebar-navigation [menuItems]="menuItems" />
+          </section>
+        </div>
+        <div class="p-4 border-t border-surface-200 dark:border-surface-700">
+          <!-- footer -->
+          <section class="">footer2</section>
+        </div>
+      </div>
+    </aside>
+  </div>
+}
+
+<!-- <dialog class="md:hidden fixed inset-0 z-30 flex">
+    <button
+      class="absolute inset-0 bg-black/40"
+      aria-label="Close sidebar"
+      (click)="closeMobile()"
+    ></button>
+
+    <aside class="relative w-72 bg-white shadow-xl h-full">
+      <div class="h-full flex flex-col">
+        <div class="p-4 border-b">
+          <button (click)="closeMobile()" class="text-sm">Cerrar</button>
+        </div>
+        <div class="p-4 flex-1 overflow-auto">
+          <section class="bg-yellow-500 h-full">body</section>
+        </div>
+        <div class="p-4 border-t">
+          <section class="bg-blue-500">footer</section>
+        </div>
+      </div>
+    </aside>
+  </dialog> -->
