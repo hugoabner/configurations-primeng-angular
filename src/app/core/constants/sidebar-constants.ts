@@ -1,9 +1,9 @@
 type MenuItem = {
-  label: string;
-  icon: string;
-  route?: string;
-  exact?: boolean;
-  submenus?: { label: string; route: string }[];
+  readonly label: string;
+  readonly icon?: string; // Opcional si no todos los elementos tienen íconos
+  readonly route?: string; // Opcional si algunos elementos no tienen rutas
+  readonly exact: boolean;
+  readonly submenus: { label: string; route: string }[]; // Siempre un array, aunque vacío
 };
 export const MENU_ITEMS: MenuItem[] = [
   {
@@ -24,7 +24,7 @@ export const MENU_ITEMS: MenuItem[] = [
     label: 'Usuarios',
     icon: 'pi pi-users',
     exact: false,
-    route: '#',
+    // route: '/#',
     submenus: [
       { label: 'Lista de Usuarios', route: '/usuarios/lista' },
       { label: 'Roles', route: '/usuarios/roles' },

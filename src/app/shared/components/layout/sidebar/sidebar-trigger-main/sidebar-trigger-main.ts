@@ -23,7 +23,7 @@ export class SidebarTriggerMain {
     // md breakpoint = 768px (ajusta si en tu Tailwind es distinto)
     if (typeof window !== 'undefined') {
       this.isDesktop = window.matchMedia('(min-width: 768px)').matches;
-      console.log(this.isDesktop);
+      // console.log(this.isDesktop);
     } else {
       this.isDesktop = true; // fallback for SSR or environments without window
     }

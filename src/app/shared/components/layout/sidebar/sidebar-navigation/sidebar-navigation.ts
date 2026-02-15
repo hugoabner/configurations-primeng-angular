@@ -1,10 +1,16 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, inject, Input, OnDestroy } from '@angular/core';
+import { Component, ElementRef, inject, Input, OnDestroy, signal } from '@angular/core';
 import { Router, RouterLink, RouterModule } from '@angular/router';
 import { TooltipModule } from 'primeng/tooltip';
 import { Subscription } from 'rxjs';
 import { SidebarService } from '../../../../../core/services/sidebar-service/sidebar-service';
-
+type MenuItem = {
+  readonly label: string;
+  readonly icon?: string; // Opcional si no todos los elementos tienen íconos
+  readonly route?: string; // Opcional si algunos elementos no tienen rutas
+  readonly exact: boolean;
+  readonly submenus: { label: string; route: string }[]; // Siempre un array, aunque vacío
+};
 @Component({
   selector: 'app-sidebar-navigation',
   imports: [RouterLink, RouterModule, CommonModule, TooltipModule],
@@ -13,14 +19,21 @@ import { SidebarService } from '../../../../../core/services/sidebar-service/sid
 })
 export class SidebarNavigation implements OnDestroy {
   desktopOpen: boolean = true;
+  // variable para controlar qué item está expandido (si es que hay alguno)
   expandedIndex: number | null = null;
+  // indice del item actualmente hovered para mostrar el dropdown
   hoveredIndex: number | null = null;
-  hoveredItem: any = null;
+  // item actualmente hovered para mostrar el dropdown
+  hoveredItem = signal<MenuItem | null>(null);
   dropdownPosition = { left: 0, top: 0 };
 
+  // Timeout para cerrar el dropdown después de un breve retraso
   private hoverTimeout: any = null;
-  private dropdownHovered = false;
-  @Input() menuItems: any[] = [];
+  // Variable para controlar si el mouse está sobre el dropdown
+  // signal para controlar si el mouse esta sobre el dropdown
+  dropdownHovered = signal<boolean>(false);
+  
+  @Input() menuItems: MenuItem[] = [];
 
   readonly _sidebarService = inject(SidebarService);
   private subscription: Subscription = new Subscription();
@@ -38,6 +51,7 @@ export class SidebarNavigation implements OnDestroy {
     });
   }
 
+  // cuando el mouse entra a un item, mostrar el dropdown si no estamos en desktop
   public onItemMouseEnter(index: number, event: MouseEvent) {
     if (!this.desktopOpen) {
       // Limpiar timeout anterior
@@ -45,10 +59,11 @@ export class SidebarNavigation implements OnDestroy {
 
       const item = this.menuItems[index];
       this.hoveredIndex = index;
-      this.hoveredItem = item;
+      this.hoveredItem.set(item);
 
       // Calcular posición del dropdown
       const target = event.target as HTMLElement;
+      // console.log("Target:", target);
       const rect = target.getBoundingClientRect();
 
       // Posición fija similar a React
@@ -59,11 +74,12 @@ export class SidebarNavigation implements OnDestroy {
     }
   }
 
+  // cuando el mouse sale de un item, ocultar el dropdown después de un breve retraso (para dar tiempo al hover del dropdown)
   public onItemMouseLeave() {
     if (!this.desktopOpen) {
       // Retrasar la desaparición para dar tiempo al hover del dropdown
       this.hoverTimeout = setTimeout(() => {
-        if (!this.dropdownHovered) {
+        if (!this.dropdownHovered()) {
           this.closeDropdown();
         }
       }, 150);
@@ -73,13 +89,13 @@ export class SidebarNavigation implements OnDestroy {
   public onDropdownMouseEnter() {
     if (!this.desktopOpen) {
       this.clearHoverTimeout();
-      this.dropdownHovered = true;
+      this.dropdownHovered.set(true);
     }
   }
 
   public onDropdownMouseLeave() {
     if (!this.desktopOpen) {
-      this.dropdownHovered = false;
+      this.dropdownHovered.set(false);
       this.hoverTimeout = setTimeout(() => {
         this.closeDropdown();
       }, 100);
@@ -94,9 +110,10 @@ export class SidebarNavigation implements OnDestroy {
   }
 
   public closeDropdown() {
+    // indice del item actualmente hovered
     this.hoveredIndex = null;
-    this.hoveredItem = null;
-    this.dropdownHovered = false;
+    this.hoveredItem.set(null);
+    this.dropdownHovered.set(false);
     this.clearHoverTimeout();
   }
 

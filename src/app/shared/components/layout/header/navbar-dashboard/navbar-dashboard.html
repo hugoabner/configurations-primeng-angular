@@ -6,14 +6,9 @@
 >
   <app-sidebar-trigger-main />
   <div class="flex gap-4">
-    <p-button pTooltip="Logout" icon="pi pi-sign-out"></p-button>
-    <p-button class="" label="Check" />
-    <div
-      class="bg-primary-100 p-3 rounded-2xl text-color-emphasis hover:bg-primary-600 cursor-pointer"
-    >
-      hola
-    </div>
-    <p-button label="Toggle Dark Mode" (onClick)="toggleDarkMode()" />
+    <p-button pTooltip="Logout" icon="pi pi-sign-out" size="small"></p-button>
+    <p-button class="" label="Check" size="small" />
+    <p-button [icon]="isDark ? 'pi pi-sun' : 'pi pi-moon'" size="small" (onClick)="toggleDarkMode()" />
     <!-- <button
       type="button"
       class="bg-emerald-400 p-3 rounded-2xl text-white hover:bg-green-600 cursor-pointer"

@@ -1,4 +1,4 @@
-<ul class="list-none">
+<ul class="space-y-1">
   @for (item of menuItems; track $index; let i = $index) {
     <li
       class="relative group"
@@ -9,7 +9,7 @@
       <!-- Item principal -->
       <a
         [routerLink]="item.route || null"
-        [routerLinkActive]="item.submenus?.length === 0 ? 'active' : ''"
+        [routerLinkActive]="item.submenus.length === 0 ? 'active' : ''"
         [routerLinkActiveOptions]="{ exact: item.exact }"
         (click)="navigateAndClose(item)"
         [class.justify-center]="!desktopOpen"
@@ -17,16 +17,16 @@
         hover:bg-surface-200 dark:hover:bg-surface-700 
         transition-colors duration-200 font-medium"
         [class.bg-primary-500]="
-          (item.submenus?.length === 0 && isLinkActive(item.route)) ||
-          (item.submenus?.length > 0 && isSubmenuActive(item.submenus))
+          (item.submenus.length === 0 && isLinkActive(item.route || '')) ||
+          (item.submenus.length > 0 && isSubmenuActive(item.submenus))
         "
         [class.text-primary-600]="
-          (item.submenus?.length === 0 && isLinkActive(item.route)) ||
-          (item.submenus?.length > 0 && isSubmenuActive(item.submenus))
+          (item.submenus.length === 0 && isLinkActive(item.route || '')) ||
+          (item.submenus.length > 0 && isSubmenuActive(item.submenus))
         "
         [class.text-white]="
-          (item.submenus?.length === 0 && isLinkActive(item.route)) ||
-          (item.submenus?.length > 0 && isSubmenuActive(item.submenus))
+          (item.submenus.length === 0 && isLinkActive(item.route || '')) ||
+          (item.submenus.length > 0 && isSubmenuActive(item.submenus))
         "
         
         #menuItem
@@ -39,7 +39,7 @@
           (item.submenus?.length > 0 && isSubmenuActive(item.submenus))
         " -->
         @if (item.icon) {
-          <i class="text-lg w-6 flex-shrink-0 text-center" [class]="item.icon"></i>
+          <i class="text-lg w-6 shrink-0 text-center" [class]="item.icon"></i>
         }
         @if (desktopOpen) {
           <span class="ml-3 truncate transition-opacity duration-200">
@@ -79,9 +79,9 @@
 </ul>
 
 <!-- Submenús flotantes fijos (como en React) -->
-@if (!desktopOpen && hoveredItem && hoveredItem.submenus && hoveredItem.submenus.length > 0) {
+@if (!desktopOpen && hoveredItem() && hoveredItem()?.submenus && hoveredItem()!.submenus!.length > 0) {
   <div
-    class="fixed z-[100] hidden md:block bg-white"
+    class="fixed z-100 hidden md:block bg-white"
     [ngStyle]="{
       'left.px': dropdownPosition.left,
       'top.px': dropdownPosition.top,
@@ -89,12 +89,12 @@
     (mouseenter)="onDropdownMouseEnter()"
     (mouseleave)="onDropdownMouseLeave()"
   >
-    <div class="bg-white border border-gray-200 rounded-lg shadow-lg min-w-[180px] ml-1">
+    <div class="bg-white border border-gray-200 rounded-lg shadow-lg min-w-45 ml-1">
       <div class="font-semibold px-3 py-2 text-sm border-b border-gray-200 bg-gray-50 rounded-t-lg">
-        {{ hoveredItem.label }}
+        {{ hoveredItem()?.label }}
       </div>
       <div class="space-y-1">
-        @for (subItem of hoveredItem.submenus; track subItem.label) {
+        @for (subItem of hoveredItem()?.submenus; track subItem.label) {
           <a
             [routerLink]="subItem.route"
             routerLinkActive="active"

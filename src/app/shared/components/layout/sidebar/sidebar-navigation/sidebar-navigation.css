@@ -1,0 +1,26 @@
+/* Estilos específicos para sidebar colapsado */
+.sidebar-collapsed .menu-item-content {
+  justify-content: center;
+}
+
+.sidebar-collapsed .menu-text {
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+}
+
+/* Submenú flotante fijo (como en React) */
+.fixed-dropdown {
+  animation: fadeIn 0.15s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
