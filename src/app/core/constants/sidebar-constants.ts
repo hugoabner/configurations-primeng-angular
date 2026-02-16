@@ -19,18 +19,7 @@ export const MENU_ITEMS: MenuItem[] = [
     route: '/polizas',
     exact: false,
     submenus: [],
-  },
-  {
-    label: 'Usuarios',
-    icon: 'pi pi-users',
-    exact: false,
-    // route: '/#',
-    submenus: [
-      { label: 'Lista de Usuarios', route: '/usuarios/lista' },
-      { label: 'Roles', route: '/usuarios/roles' },
-      { label: 'Forms', route: '/home/forms' },
-    ],
-  }  
+  }
   // {
   //   label: 'Configuración',
   //   icon: 'fas fa-cog',
