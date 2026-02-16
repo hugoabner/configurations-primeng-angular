@@ -8,13 +8,8 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
   {
-    path: '',
+    path: 'polizas',
     component: DashboardLayout,
-    children: [
-       {
-        path: 'polizas',
-        loadComponent: () => import('./features/import-poliza/poliza/poliza').then((m) => m.Poliza),
-      },
-    ],
+    loadComponent: () => import('./features/import-poliza/poliza/poliza').then((m) => m.Poliza),
   },
 ];
