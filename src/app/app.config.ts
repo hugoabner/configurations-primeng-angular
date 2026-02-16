@@ -1,4 +1,4 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { providePrimeNG } from 'primeng/config';
 
@@ -8,6 +8,7 @@ import { routes } from './app.routes';
 import MyPreset from './mypreset';
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideZonelessChangeDetection(), // Habilita el modo zoneless (opcional si es proyecto nuevo v21)
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
     provideClientHydration(withEventReplay()),
