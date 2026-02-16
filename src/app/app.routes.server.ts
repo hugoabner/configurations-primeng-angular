@@ -2,11 +2,11 @@ import { RenderMode, ServerRoute } from '@angular/ssr';
 
 export const serverRoutes: ServerRoute[] = [
   {
-    path: '', // Agrega la ruta raíz
+    path: 'polizas',
     renderMode: RenderMode.Server,
   },
   {
-    path: 'polizas',
+    path: '**', // Captura cualquier otra ruta (incluida la raíz)
     renderMode: RenderMode.Server,
   },
 ];
