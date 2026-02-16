@@ -10,13 +10,19 @@
 }
 }/* padding: 2rem 0; */
 
-body {
-  margin: 0;
+html {
+  font-size: 14px;
+}
+
+/* body {
+  margin: 0px;
   min-height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
+  background-color: var(--body-bg);
   font-weight: normal;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background: light-dark(var(--p-surface-0), var(--p-surface-950));
-} 
+  color: var(--body-text-color);
+} */
+
+
+    

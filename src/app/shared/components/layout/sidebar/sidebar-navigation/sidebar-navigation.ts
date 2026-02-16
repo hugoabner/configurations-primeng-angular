@@ -4,6 +4,8 @@ import { Router, RouterLink, RouterModule } from '@angular/router';
 import { TooltipModule } from 'primeng/tooltip';
 import { Subscription } from 'rxjs';
 import { SidebarService } from '../../../../../core/services/sidebar-service/sidebar-service';
+import { NavItem, SidebarGroup } from '../../../../../core/types/interface-sidebar';
+import { SidebarSubmenu } from "../sidebar-submenu/sidebar-submenu";
 type MenuItem = {
   readonly label: string;
   readonly icon?: string; // Opcional si no todos los elementos tienen íconos
@@ -13,27 +15,25 @@ type MenuItem = {
 };
 @Component({
   selector: 'app-sidebar-navigation',
-  imports: [RouterLink, RouterModule, CommonModule, TooltipModule],
+  imports: [RouterLink, RouterModule, CommonModule, TooltipModule, SidebarSubmenu],
   templateUrl: './sidebar-navigation.html',
   styleUrl: './sidebar-navigation.css',
 })
 export class SidebarNavigation implements OnDestroy {
   desktopOpen: boolean = true;
-  // variable para controlar qué item está expandido (si es que hay alguno)
-  expandedIndex: number | null = null;
-  // indice del item actualmente hovered para mostrar el dropdown
-  hoveredIndex: number | null = null;
-  // item actualmente hovered para mostrar el dropdown
-  hoveredItem = signal<MenuItem | null>(null);
+  
+  // Variables para controlar expansión en modo desktop
+  expandedItems: Set<string> = new Set<string>();
+  
+  // Variables para dropdown flotante en modo collapsed
+  hoveredItem = signal<NavItem | null>(null);
+  hoveredItemPath = signal<string>('');
   dropdownPosition = { left: 0, top: 0 };
-
-  // Timeout para cerrar el dropdown después de un breve retraso
-  private hoverTimeout: any = null;
-  // Variable para controlar si el mouse está sobre el dropdown
-  // signal para controlar si el mouse esta sobre el dropdown
   dropdownHovered = signal<boolean>(false);
   
-  @Input() menuItems: MenuItem[] = [];
+  private hoverTimeout: any = null;
+  
+  @Input() menuGroups: SidebarGroup[] = [];
 
   readonly _sidebarService = inject(SidebarService);
   private subscription: Subscription = new Subscription();
@@ -45,39 +45,33 @@ export class SidebarNavigation implements OnDestroy {
     this.subscription = this._sidebarService.desktopOpen$.subscribe((isOpen: boolean) => {
       this.desktopOpen = isOpen;
       if (!isOpen) {
-        this.expandedIndex = null;
+        this.expandedItems.clear();
         this.closeDropdown();
       }
     });
   }
 
-  // cuando el mouse entra a un item, mostrar el dropdown si no estamos en desktop
-  public onItemMouseEnter(index: number, event: MouseEvent) {
+  // Cuando el mouse entra a un item en modo collapsed
+  public onItemMouseEnter(item: NavItem, event: MouseEvent, path: string = '') {
     if (!this.desktopOpen) {
-      // Limpiar timeout anterior
       this.clearHoverTimeout();
 
-      const item = this.menuItems[index];
-      this.hoveredIndex = index;
       this.hoveredItem.set(item);
+      this.hoveredItemPath.set(path);
 
       // Calcular posición del dropdown
-      const target = event.target as HTMLElement;
-      // console.log("Target:", target);
+      const target = event.currentTarget as HTMLElement;
       const rect = target.getBoundingClientRect();
 
-      // Posición fija similar a React
       this.dropdownPosition = {
-        left: rect.right + 8, // 8px de margen
+        left: rect.right + 8,
         top: rect.top,
       };
     }
   }
 
-  // cuando el mouse sale de un item, ocultar el dropdown después de un breve retraso (para dar tiempo al hover del dropdown)
   public onItemMouseLeave() {
     if (!this.desktopOpen) {
-      // Retrasar la desaparición para dar tiempo al hover del dropdown
       this.hoverTimeout = setTimeout(() => {
         if (!this.dropdownHovered()) {
           this.closeDropdown();
@@ -110,53 +104,80 @@ export class SidebarNavigation implements OnDestroy {
   }
 
   public closeDropdown() {
-    // indice del item actualmente hovered
-    this.hoveredIndex = null;
     this.hoveredItem.set(null);
+    this.hoveredItemPath.set('');
     this.dropdownHovered.set(false);
     this.clearHoverTimeout();
   }
 
-  public toggleSubmenu(index: number): void {
-    if (this.expandedIndex === index) {
-      this.expandedIndex = null;
-    } else {
-      this.expandedIndex = index;
+  // Toggle para submenús en modo desktop
+  public toggleSubmenu(item: NavItem, event?: MouseEvent) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    
+    if (this.hasSubItems(item)) {
+      const key = this.getItemKey(item);
+      if (this.expandedItems.has(key)) {
+        this.expandedItems.delete(key);
+      } else {
+        this.expandedItems.add(key);
+      }
     }
   }
 
-  public closeSubmenu() {
-    this.expandedIndex = null;
+  public isExpanded(item: NavItem): boolean {
+    return this.expandedItems.has(this.getItemKey(item));
   }
 
-  public navigateAndClose(item: any): void {
-    // if (item.submenus && item.submenus.length > 0 && this.desktopOpen) {
-    if (item.submenus && this.desktopOpen) {
-      const index = this.menuItems.findIndex((i) => i === item);
-      this.toggleSubmenu(index);
-    } else if (item.route && (!item.submenus || item.submenus.length === 0)) {
-      this.router.navigate([item.route]);
+  private getItemKey(item: NavItem): string {
+    return item.href || item.label;
+  }
+
+  public hasSubItems(item: NavItem): boolean {
+    return !!(item.subItems && item.subItems.length > 0);
+  }
+
+  public navigateAndClose(item: NavItem): void {
+    if (item.href && !this.hasSubItems(item)) {
+      this.router.navigate([item.href]);
       if (!this.desktopOpen) {
         this.closeDropdown();
       }
     }
   }
 
-  public isLinkActive(route: string): boolean {
-    if (!route) return false;
-    return this.router.isActive(route, {
-      paths: 'exact',
+  public isLinkActive(href: string, exact: boolean = false): boolean {
+    if (!href) return false;
+    return this.router.isActive(href, {
+      paths: exact ? 'exact' : 'subset',
       queryParams: 'ignored',
       fragment: 'ignored',
       matrixParams: 'ignored',
     });
   }
-  /**
-   * name
-   */
-  public isSubmenuActive(submenus: { label: string; route: string }[]): boolean {
-    return submenus.some((submenu) => this.isLinkActive(submenu.route));
+
+  public isSubmenuActive(item: NavItem): boolean {
+    if (!item.subItems) return false;
+    
+    return item.subItems.some(subItem => {
+      if (this.isLinkActive(subItem.href, subItem.exact)) {
+        return true;
+      }
+      if (subItem.subItems) {
+        return this.isSubmenuActive(subItem);
+      }
+      return false;
+    });
   }
+
+  public shouldShowItem(item: NavItem): boolean {
+    // Aquí puedes implementar lógica de roles
+    // Por ahora retornamos true
+    return true;
+  }
+
   ngOnDestroy(): void {
     this.clearHoverTimeout();
     this.subscription.unsubscribe();

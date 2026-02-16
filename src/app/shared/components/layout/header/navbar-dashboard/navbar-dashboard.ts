@@ -1,11 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
-import { Tooltip } from "primeng/tooltip";
 import { SidebarTriggerMain } from '../../sidebar/sidebar-trigger-main/sidebar-trigger-main';
 @Component({
   selector: 'app-navbar-dashboard',
-  imports: [SidebarTriggerMain, CommonModule, ButtonModule, Tooltip],
+  imports: [SidebarTriggerMain, CommonModule, ButtonModule],
   templateUrl: './navbar-dashboard.html',
   styleUrl: './navbar-dashboard.css',
 })

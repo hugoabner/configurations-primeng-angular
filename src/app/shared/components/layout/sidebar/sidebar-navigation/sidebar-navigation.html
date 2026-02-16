@@ -1,120 +1,123 @@
-<ul class="space-y-1">
-  @for (item of menuItems; track $index; let i = $index) {
-    <li
-      class="relative group"
-      [ngClass]="{ 'sidebar-collapsed': !desktopOpen }"
-      (mouseenter)="!desktopOpen ? onItemMouseEnter(i, $event) : null"
-      (mouseleave)="!desktopOpen ? onItemMouseLeave() : null"
-    >
-      <!-- Item principal -->
-      <a
-        [routerLink]="item.route || null"
-        [routerLinkActive]="item.submenus.length === 0 ? 'active' : ''"
-        [routerLinkActiveOptions]="{ exact: item.exact }"
-        (click)="navigateAndClose(item)"
-        [class.justify-center]="!desktopOpen"
-        class="flex items-center rounded-lg p-1.5 text-[16px] transition-colors duration-200 
-        font-medium hover:bg-primary-50 dark:hover:bg-primary-900/30 hover:text-primary-700 dark:hover:text-primary-300"
-        [class.bg-primary-50]="
-          (item.submenus.length === 0 && isLinkActive(item.route || '')) ||
-          (item.submenus.length > 0 && isSubmenuActive(item.submenus))
-        "
-        [class.dark:bg-primary-900/30]="
-          (item.submenus.length === 0 && isLinkActive(item.route || '')) ||
-          (item.submenus.length > 0 && isSubmenuActive(item.submenus))
-        "
-        [class.text-primary-700]="
-          (item.submenus.length === 0 && isLinkActive(item.route || '')) ||
-          (item.submenus.length > 0 && isSubmenuActive(item.submenus))
-        "
-        [class.dark:text-primary-300]="
-          (item.submenus.length === 0 && isLinkActive(item.route || '')) ||
-          (item.submenus.length > 0 && isSubmenuActive(item.submenus))
-        "
-        #menuItem
-        [pTooltip]="
-          !desktopOpen && (!item.submenus || item.submenus.length === 0) ? item.label : ''
-        "
-      >
-        @if (item.icon) {
-          <i
-            class="flex items-center rounded-lg p-1.5 text-[16px] transition-colors duration-200 
-            font-medium "
-            [class]="item.icon"
-            [class.text-primary-600]="
-              (item.submenus.length === 0 && isLinkActive(item.route || '')) ||
-              (item.submenus.length > 0 && isSubmenuActive(item.submenus))
-            "
-            [class.dark:text-primary-400]="
-              (item.submenus.length === 0 && isLinkActive(item.route || '')) ||
-              (item.submenus.length > 0 && isSubmenuActive(item.submenus))
-            "
-          ></i>
-        }
+<!-- Iterar sobre los grupos del menú -->
+@for (group of menuGroups; track group.title) {
+  <div class="px-3 pt-4">
+    <h3 class="text-xs font-semibold text-surface-500 dark:text-surface-400 uppercase tracking-wider truncate"
+    [ngClass]=" { 'text-center': !desktopOpen }">
         @if (desktopOpen) {
-          <span
-            class="ml-3 truncate transition-opacity duration-200"
-            [class.font-semibold]="
-              (item.submenus.length === 0 && isLinkActive(item.route || '')) ||
-              (item.submenus.length > 0 && isSubmenuActive(item.submenus))
-            "
-          >
-            {{ item.label }}
-          </span>
-          <!-- si hay submenús mostrar flecha -->
-          @if (item.submenus && item.submenus.length > 0) {
-            <i
-              class="ml-auto text-xs transition-all duration-200"
-              [class]="expandedIndex === i ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
-              [class.text-primary-500]="
-                expandedIndex === i || (item.submenus.length > 0 && isSubmenuActive(item.submenus))
-              "
-            ></i>
-          }
+          {{ group.title }}
+        } @else {
+          <i class="pi pi-ellipsis-h text-sm"></i>
         }
-      </a>
-
-      <!-- Submenús expandidos (sidebar abierto) -->
-      @if (desktopOpen && item.submenus && item.submenus.length > 0 && expandedIndex === i) {
-        <ul
-          class="ml-6 mt-1 space-y-1 pl-2 border-l-2 border-primary-200 dark:border-primary-800 animate-slideDown"
+      </h3>
+    </div>
+  
+  <ul class="space-y-1 pt-2">
+    @for (item of group.items; track item.href; let i = $index) {
+      @if (shouldShowItem(item)) {
+        <li
+          class="relative group"
+          [ngClass]="{ 'sidebar-collapsed': !desktopOpen }"
+          (mouseenter)="!desktopOpen ? onItemMouseEnter(item, $event, group.title) : null"
+          (mouseleave)="!desktopOpen ? onItemMouseLeave() : null"
         >
-          @for (child of item.submenus; track child.label) {
-            <li>
-              <a
-                [routerLink]="child.route"
-                routerLinkActive="active"
-                #subLink="routerLinkActive"
-                class="flex items-center rounded-lg p-2 text-sm transition-all duration-200
-                hover:bg-primary-50 dark:hover:bg-primary-900/30
-                hover:text-primary-700 dark:hover:text-primary-300
-                hover:translate-x-1"
-                [class.bg-primary-50]="subLink.isActive"
-                [class.dark:bg-primary-900/30]="subLink.isActive"
-                [class.text-primary-700]="subLink.isActive"
-                [class.dark:text-primary-300]="subLink.isActive"
-                [class.font-medium]="subLink.isActive"
+          <!-- Item principal -->
+          <a
+            [routerLink]="!hasSubItems(item) ? item.href : null"
+            [routerLinkActive]="!hasSubItems(item) ? 'active' : ''"
+            [routerLinkActiveOptions]="{ exact: item.exact || false }"
+            (click)="hasSubItems(item) ? toggleSubmenu(item, $event) : navigateAndClose(item)"
+            [class.justify-center]="!desktopOpen"
+            class="flex items-center rounded-lg p-1.5 text-[16px] transition-colors duration-200 
+            font-medium hover:bg-primary-50 dark:hover:bg-primary-900/30 hover:text-primary-700 dark:hover:text-primary-300 cursor-pointer"
+            [class.bg-primary-50]="
+              (!hasSubItems(item) && isLinkActive(item.href || '', item.exact)) ||
+              (hasSubItems(item) && isSubmenuActive(item))
+            "
+            [class.dark:bg-primary-900/30]="
+              (!hasSubItems(item) && isLinkActive(item.href || '', item.exact)) ||
+              (hasSubItems(item) && isSubmenuActive(item))
+            "
+            [class.text-primary-700]="
+              (!hasSubItems(item) && isLinkActive(item.href || '', item.exact)) ||
+              (hasSubItems(item) && isSubmenuActive(item))
+            "
+            [class.dark:text-primary-300]="
+              (!hasSubItems(item) && isLinkActive(item.href || '', item.exact)) ||
+              (hasSubItems(item) && isSubmenuActive(item))
+            "
+            [pTooltip]="
+              !desktopOpen && !hasSubItems(item) ? item.label : ''
+            "
+            tooltipPosition="right"
+          >
+            @if (item.icon) {
+              <i
+                class="flex items-center rounded-lg p-1.5 text-[16px] transition-colors duration-200 font-medium"
+                [ngClass]="item.icon"
+                [class.text-primary-600]="
+                  (!hasSubItems(item) && isLinkActive(item.href || '', item.exact)) ||
+                  (hasSubItems(item) && isSubmenuActive(item))
+                "
+                [class.dark:text-primary-400]="
+                  (!hasSubItems(item) && isLinkActive(item.href || '', item.exact)) ||
+                  (hasSubItems(item) && isSubmenuActive(item))
+                "
+              ></i>
+            }
+            
+            @if (desktopOpen) {
+              <span
+                class="ml-3 truncate transition-opacity duration-200 flex-1"
+                [class.font-semibold]="
+                  (!hasSubItems(item) && isLinkActive(item.href || '', item.exact)) ||
+                  (hasSubItems(item) && isSubmenuActive(item))
+                "
               >
-                <!-- Indicador visual de subitem activo -->
-                @if (subLink.isActive) {
-                  <span class="w-1 h-1 rounded-full bg-primary-500 mr-2"></span>
-                }
-                <span class="truncate" [class.ml-3]="!subLink.isActive">
-                  {{ child.label }}
-                </span>
-              </a>
-            </li>
-          }
-        </ul>
-      }
-    </li>
-  }
-</ul>
+                {{ item.label }}
+              </span>
+              
+              <!-- Flecha para items con subItems -->
+              @if (hasSubItems(item)) {
+                <i
+                  class="ml-auto text-xs transition-all duration-200"
+                  [ngClass]="isExpanded(item) ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
+                  [class.text-primary-500]="
+                    isExpanded(item) || (hasSubItems(item) && isSubmenuActive(item))
+                  "
+                ></i>
+              }
+            }
+          </a>
 
-<!-- Submenús flotantes fijos (como en React) -->
-@if (
-  !desktopOpen && hoveredItem() && hoveredItem()?.submenus && hoveredItem()!.submenus!.length > 0
-) {
+          <!-- Submenús en modo desktop -->
+          @if (desktopOpen && hasSubItems(item) && isExpanded(item)) {
+            <ul
+              class="ml-6 mt-1 space-y-1 pl-2 border-l-2 border-primary-200 dark:border-primary-800 animate-slideDown"
+            >
+              @for (subItem of item.subItems; track subItem.href) {
+                @if (shouldShowItem(subItem)) {
+                  <li>
+                    <!-- Subitem recursivo -->
+                    <app-sidebar-submenu
+                      [item]="subItem"
+                      [desktopOpen]="desktopOpen"
+                      [level]="1"
+                      (navigate)="navigateAndClose(subItem)"
+                      (toggle)="toggleSubmenu($event)"
+                    />
+                  </li>
+                }
+              }
+            </ul>
+          }
+        </li>
+      }
+    }
+  </ul>
+}
+
+<!-- Dropdown flotante para modo collapsed -->
+@if (!desktopOpen && hoveredItem() && hasSubItems(hoveredItem()!)) {
   <div
     class="fixed z-100 hidden md:block bg-surface-100 dark:bg-surface-800 rounded-lg shadow-lg min-w-48 max-w-64 animate-slideInLeft"
     [ngStyle]="{
@@ -123,33 +126,81 @@
     }"
     (mouseenter)="onDropdownMouseEnter()"
     (mouseleave)="onDropdownMouseLeave()"
-    #floatingMenu
   >
-    <div class="">
-      <!-- cabecera del dropdown -->
+    <div>
+      <!-- Cabecera del dropdown -->
       <div class="px-4 py-3 border-b border-surface-200 dark:border-surface-700">
-        <span class="text-[16px] font-semibold text-surface-700 dark:text-surface-200">
+        <span class="text-sm font-semibold text-surface-700 dark:text-surface-200 flex items-center gap-2">
+          @if (hoveredItem()?.icon) {
+            <i [ngClass]="hoveredItem()?.icon"></i>
+          }
           {{ hoveredItem()?.label }}
         </span>
+        @if (hoveredItemPath()) {
+          <span class="text-xs text-surface-500 dark:text-surface-400 block mt-1">
+            {{ hoveredItemPath() }}
+          </span>
+        }
       </div>
 
       <!-- Lista de submenús -->
       <div class="p-2 max-h-96 overflow-y-auto custom-scrollbar">
-        @for (subItem of hoveredItem()?.submenus; track subItem.label) {
-          <a
-            [routerLink]="subItem.route"
-            routerLinkActive="active"
-            #submenuLink="routerLinkActive"
-            class="flex items-center gap-3 px-3 py-2.5 text-sm rounded-md transition-all duration-200 hover:translate-x-1 hover:bg-primary-50 dark:hover:bg-primary-900/30 group"
-            [class.bg-primary-100]="submenuLink.isActive"
-            [class.text-primary-700]="submenuLink.isActive"
-            [class.dark:bg-primary-900/30]="submenuLink.isActive"
-            [class.font-medium]="submenuLink.isActive"
-            (click)="closeDropdown()"
-          >
-            <!-- [class.text-primary-600]="isLinkActive(subItem.route)" -->
-            <span>{{ subItem.label }}</span>
-          </a>
+        @for (subItem of hoveredItem()?.subItems; track subItem.href) {
+          @if (shouldShowItem(subItem)) {
+            <div class="mb-1">
+              @if (hasSubItems(subItem)) {
+                <!-- Subitem con hijos en dropdown -->
+                <div class="px-3 py-2 text-sm font-medium text-surface-600 dark:text-surface-300">
+                  {{ subItem.label }}
+                </div>
+                <div class="ml-3 pl-2 border-l border-surface-300 dark:border-surface-600">
+                  @for (grandChild of subItem.subItems; track grandChild.href) {
+                    <a
+                      [routerLink]="grandChild.href"
+                      routerLinkActive="active"
+                      #submenuLink="routerLinkActive"
+                      class="flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-all duration-200 hover:translate-x-1 hover:bg-primary-50 dark:hover:bg-primary-900/30 group cursor-pointer"
+                      [class.bg-primary-100]="submenuLink.isActive"
+                      [class.text-primary-700]="submenuLink.isActive"
+                      [class.dark:bg-primary-900/30]="submenuLink.isActive"
+                      [class.font-medium]="submenuLink.isActive"
+                      >
+                      <!-- (click)="closeDropdown()" -->
+                      @if (submenuLink.isActive) {
+                        <span class="w-1 h-1 rounded-full bg-primary-500"></span>
+                      }
+                      <span [class.ml-3]="!submenuLink.isActive">
+                        {{ grandChild.label }}
+                      </span>
+                    </a>
+                  }
+                </div>
+              } @else {
+                <!-- Subitem sin hijos -->
+                <a
+                  [routerLink]="subItem.href"
+                  routerLinkActive="active"
+                  #submenuLink="routerLinkActive"
+                  class="flex items-center gap-3 px-3 py-2.5 text-sm rounded-md transition-all duration-200 hover:translate-x-1 hover:bg-primary-50 dark:hover:bg-primary-900/30 group cursor-pointer"
+                  [class.bg-primary-100]="submenuLink.isActive"
+                  [class.text-primary-700]="submenuLink.isActive"
+                  [class.dark:bg-primary-900/30]="submenuLink.isActive"
+                  [class.font-medium]="submenuLink.isActive"
+                  >
+                  <!-- (click)="closeDropdown()" -->
+                  @if (submenuLink.isActive) {
+                    <span class="w-1 h-1 rounded-full bg-primary-500 mr-2"></span>
+                  }
+                  @if (subItem.icon) {
+                    <i [ngClass]="subItem.icon" class="text-sm"></i>
+                  }
+                  <span [class.ml-3]="!submenuLink.isActive && !subItem.icon">
+                    {{ subItem.label }}
+                  </span>
+                </a>
+              }
+            </div>
+          }
         }
       </div>
     </div>

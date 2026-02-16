@@ -6,11 +6,8 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Client,
   },
   {
-    path: 'home',
-    renderMode: RenderMode.Server,
-  },
-  {
     path: 'polizas',
     renderMode: RenderMode.Client,
-  }
+  },
+  
 ];

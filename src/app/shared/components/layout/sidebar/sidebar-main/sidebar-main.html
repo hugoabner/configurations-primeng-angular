@@ -7,12 +7,27 @@
 >
   <!-- [ngClass]="{ 'translate-x-0': desktopOpen, '-translate-x-47': !desktopOpen }" -->
   <div class="h-full flex flex-col justify-between">
-    <section class="py-5">header1</section>
-    <!-- dar estilo al scrooll -->
-    <div class="p-3 flex-1 overflow-y-auto scroll-mr-96">
+    <section class="py-3">
+      <!-- en dark esta bien, pero el light no se ve la lettra por que es blanca -->
+      <img
+        src="https://karlossegurosdeautos.com/dist/img/logocolor.png"
+        alt="Logo"
+        class="mx-auto transition-all duration-300 w-40 h-11"
+        [ngClass]="desktopOpen ? 'block w-40' : 'hidden'"
+      />
+      <!-- en collapsed block y en expanded hidden -->
+      <img
+        src="https://karlosseguros.com.pe/_next/image?url=%2Fimg%2Flogoavatar.png&w=96&q=75"
+        alt="Logo"
+        class="mx-auto transition-all duration-300" 
+        [ngClass]="!desktopOpen ? 'block w-9' : 'hidden'"
+      />
+    </section>
+    <!--  scrooll delgado -->
+    <div class="px-3 py-1.5 flex-1 overflow-y-auto scroll-mr-96 custom-scrollbar">
       <!-- body -->
       <section class="h-full">
-        <app-sidebar-navigation [menuItems]="menuItems" />
+        <app-sidebar-navigation [menuGroups]="menuItems" />
       </section>
     </div>
     <section class="">footer1</section>
@@ -48,7 +63,7 @@
         <div class="p-4 flex-1 overflow-auto">
           <!-- body -->
           <section class="h-full">
-            <app-sidebar-navigation [menuItems]="menuItems" />
+            <app-sidebar-navigation [menuGroups]="menuItems" />
           </section>
         </div>
         <div class="p-4 border-t border-surface-200 dark:border-surface-700">
