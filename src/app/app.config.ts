@@ -2,10 +2,10 @@ import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/
 import { provideRouter } from '@angular/router';
 import { providePrimeNG } from 'primeng/config';
 
+import { provideHttpClient, withFetch } from '@angular/common/http';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { routes } from './app.routes';
 import MyPreset from './mypreset';
-// import { provideHttpClient, withFetch } from '@angular/common/http';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
@@ -25,6 +25,6 @@ export const appConfig: ApplicationConfig = {
       },
     }),
     // provider para HTTP Client usando Fetch API, que es más moderna y eficiente que XMLHttpRequest
-    // provideHttpClient(withFetch()),
+    provideHttpClient(withFetch()),
   ],
 };
