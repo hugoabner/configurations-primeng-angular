@@ -9,29 +9,62 @@ import { SelectModule } from 'primeng/select';
 import { Table, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { CustomerService } from '../../../core/services/customer-service';
+import { COLUMNS_POLIZA_TABLE } from './constants/poliza-constants';
 
-export interface Country {
-  name?: string;
-  code?: string;
+export type ResultadoEstado = 'APROBADO' | 'PENDIENTE' | 'RECHAZADO';
+
+export interface Poliza {
+  renovacion_id: number;
+
+  tipo_documento: 'DNI' | 'CE' | 'RUC' | string;
+
+  numero_documento: string;
+  nombre_completo: string;
+  telefono: string;
+  correo_electronico: string;
+
+  usuario_cotizacion: string;
+  uso_descripcion: string;
+  clase_descripcion: string;
+  marca_descripcion: string;
+  modelo_descripcion: string;
+  version: string;
+  codigo_modelo_cia: string;
+  descripcion_modelo_cia: string;
+
+  anio_vehiculo: number;
+  suma_asegurada: number;
+
+  numero_cotizacion_aseguradora: string;
+
+  prima_total: number;
+  prima_mensual_con_descuento: number;
+  prima_total_real: number;
+  prima_mensual: number;
+
+  nombre_aseguradora: string;
+
+  agrupador_descripcion: string;
+  agrupador_orden: number;
+  agrupador_resenia: string;
+
+  numero_anios_vigencia_poliza: number;
+  descripcion_tipo_cobertura: string;
+  producto_descripcion: string;
+
+  tasa: number;
+  prima_por_descuento: number;
+
+  agrupador_id: number;
+  requiere_gps: boolean;
+
+  descripcion_tipo_inspeccion: string;
+  url_cotizacion: string;
+
+  resultado_estado: ResultadoEstado;
+  resultado_mensaje: string;
 }
 
-export interface Representative {
-  name?: string;
-  image?: string;
-}
-
-export interface Customer {
-  id?: number;
-  name?: string;
-  country?: Country;
-  company?: string;
-  date?: string | Date;
-  status?: string;
-  activity?: number;
-  representative?: Representative;
-  verified?: boolean;
-  balance?: number;
-}
 @Component({
   selector: 'app-poliza',
   imports: [
@@ -51,17 +84,18 @@ export interface Customer {
 })
 export class Poliza implements OnInit {
   private customerService = inject(CustomerService);
-  customers!: Customer[];
-  representatives!: Representative[];
+  customers!: Poliza[];
+  representatives!: any[];
   statuses!: any[];
   loading: boolean = true;
   activityValues: number[] = [0, 100];
 
+  COLUMNS_POLIZA_TABLE = COLUMNS_POLIZA_TABLE;
   ngOnInit() {
     this.customerService.getCustomersLarge().then((customers) => {
-      this.customers = customers;
+      this.customers = customers as Poliza[];
       this.loading = false;
-      this.customers.forEach((customer) => (customer.date = new Date(<Date>customer.date)));
+      // this.customers.forEach((customer) => (customer. = new Date(<Date>customer.date)));
     });
     this.representatives = [
       { name: 'Amy Elsner', image: 'amyelsner.png' },
