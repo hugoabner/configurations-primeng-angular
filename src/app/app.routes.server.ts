@@ -5,8 +5,16 @@ export const serverRoutes: ServerRoute[] = [
     path: 'polizas',
     renderMode: RenderMode.Server,
   },
+    {
+    path: 'not-found',
+    renderMode: RenderMode.Server,
+  },
   {
-    path: '**', // Captura cualquier otra ruta (incluida la raíz)
+    path: '', // Agrega la ruta raíz
+    renderMode: RenderMode.Server,
+  },
+    {
+    path: '**', // Este debe estar presente para que coincida con tu rutas de cliente
     renderMode: RenderMode.Server,
   },
 ];
