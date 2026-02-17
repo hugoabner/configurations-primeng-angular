@@ -7,7 +7,7 @@ export type NavItem = {
   subItems?: {
   	label: string;
   	href: string;
-    	exact?: boolean;
+    exact?: boolean;
   	icon?: string;
     roles?: string[];
     subItems?: {
@@ -16,6 +16,13 @@ export type NavItem = {
       exact?: boolean;
       icon?: string;
       roles?: string[];
+      subItems?: {
+        label: string;
+        href: string;
+        exact?: boolean;
+        icon?: string;
+        roles?: string[];
+      }[]
     }[]
   }[];
 };

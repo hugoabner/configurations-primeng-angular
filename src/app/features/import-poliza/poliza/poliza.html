@@ -1,7 +1,14 @@
 <main class="p-4 h-full">
-  <div class="bg-surface-50 dark:bg-surface-900 card">
+  <!-- Contenedor con borde bonito, sombra y redondeado -->
+  <div
+    class="border border-surface-200 dark:border-surface-800 rounded-xl shadow-sm bg-surface-0 dark:bg-surface-900 overflow-hidden"
+  >
     <p-table
       #dt2
+      [resizableColumns]="true"
+      columnResizeMode="expand"
+      
+      [showGridlines]="true"
       [value]="customers"
       dataKey="id"
       [rows]="10"
@@ -36,7 +43,7 @@
       <ng-template #header>
         <tr>
           @for (item of COLUMNS_POLIZA_TABLE; track $index) {
-            <th style="width: 4%" [id]="item.key">{{ item.label }}</th>
+            <th pResizableColumn style="width: 4%" [id]="item.key">{{ item.label }}</th>
           }
           <!-- <th style="width: 22%">Country</th> -->
           <!-- <th style="width: 22%">Agent</th> -->
@@ -326,13 +333,42 @@
               ariaLabel="Filter Country"
             ></p-columnFilter>
           </th>
-          <th>
+          <!-- <th>
             <p-columnFilter
               type="text"
               field="resultado_mensaje"
               placeholder="Enter key to search"
               ariaLabel="Filter Country"
             ></p-columnFilter>
+          </th> -->
+          <th>
+            <p-columnFilter field="representative" matchMode="in" [showMenu]="false">
+              <ng-template #filter let-value let-filter="filterCallback">
+                <p-multiselect
+                  [ngModel]="value"
+                  [options]="representatives"
+                  placeholder="Any"
+                  (onChange)="filter($event.value)"
+                  optionLabel="name"
+                  [appendTo]="'body'"
+                  style="min-width: 14rem"
+                  [panelStyle]="{ minWidth: '16rem' }"
+                >
+                  <ng-template let-option #item>
+                    <div class="flex items-center gap-2">
+                      <img
+                        [alt]="option.label"
+                        src="https://primefaces.org/cdn/primeng/images/demo/avatar/{{
+                          option.image
+                        }}"
+                        style="width: 32px"
+                      />
+                      <span>{{ option.name }}</span>
+                    </div>
+                  </ng-template>
+                </p-multiselect>
+              </ng-template>
+            </p-columnFilter>
           </th>
           <!-- <th>
             <p-columnFilter field="representative" matchMode="in" [showMenu]="false">
@@ -454,7 +490,7 @@
           <td>
             {{ customer.nombre_aseguradora }}
           </td>
-           <td>
+          <td>
             {{ customer.agrupador_descripcion }}
           </td>
           <td>
@@ -463,7 +499,7 @@
           <td>
             {{ customer.agrupador_resenia }}
           </td>
-           <td>
+          <td>
             {{ customer.numero_anios_vigencia_poliza }}
           </td>
           <td>
@@ -472,7 +508,7 @@
           <td>
             {{ customer.producto_descripcion }}
           </td>
-           <td>
+          <td>
             {{ customer.tasa }}
           </td>
           <td>
@@ -481,7 +517,7 @@
           <td>
             {{ customer.agrupador_id }}
           </td>
-           <td>
+          <td>
             {{ customer.requiere_gps }}
           </td>
           <td>
@@ -490,13 +526,13 @@
           <td>
             {{ customer.url_cotizacion }}
           </td>
-           <td>
+          <td>
             {{ customer.resultado_estado }}
           </td>
           <td>
             {{ customer.resultado_mensaje }}
           </td>
-          
+
           <!-- <td>
             <div class="flex items-center gap-2">
               <img

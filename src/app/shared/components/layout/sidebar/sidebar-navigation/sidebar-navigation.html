@@ -119,7 +119,8 @@
 <!-- Dropdown flotante para modo collapsed -->
 @if (!desktopOpen && hoveredItem() && hasSubItems(hoveredItem()!)) {
   <div
-    class="fixed z-100 hidden md:block bg-surface-100 dark:bg-surface-800 rounded-lg shadow-lg min-w-48 max-w-64 animate-slideInLeft"
+    class="fixed z-50 hidden md:block bg-surface-100 dark:bg-surface-800 
+    rounded-lg shadow-lg min-w-48 max-w-64 animate-slideInLeft"
     [ngStyle]="{
       'left.px': dropdownPosition.left,
       'top.px': dropdownPosition.top,

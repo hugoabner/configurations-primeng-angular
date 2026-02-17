@@ -16,3 +16,15 @@
   border-radius: 10px;
   border: 1px solid var(--scrollbar-track);
 }
+
+:host {
+  display: block;
+  position: relative;
+  /* Un valor mayor al de la tabla y sus filtros */
+  z-index: 1100; 
+}
+
+.fixed {
+  /* Asegura que el div fijo también tenga prioridad */
+  z-index: 1100;
+}

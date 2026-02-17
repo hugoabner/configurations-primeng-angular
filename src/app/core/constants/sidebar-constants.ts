@@ -14,6 +14,41 @@ export const MENU_ITEMS: SidebarGroup[] = [
       }
     ],
   },
+  {
+    title: 'Configuración',
+    items: [
+      {
+        label: 'General',
+        href: '/configuracion/general',
+        icon: 'pi pi-cog',
+        exact: true,
+        roles: ['ADMIN', 'EMPLOYEE'],
+        subItems: [
+          {
+            label: 'Seguridad',
+            href: '/configuracion/seguridad',
+            exact: true,
+            roles: ['ADMIN', 'EMPLOYEE'],
+            subItems: [],
+          },
+          {
+            label: 'Notificaciones',
+            href: '/configuracion/notificaciones',
+            exact: true,
+            roles: ['ADMIN', 'EMPLOYEE'],
+            subItems: [],
+          },
+          {
+            label: 'Integraciones',
+            href: '/configuracion/integraciones',
+            exact: true,
+            roles: ['ADMIN', 'EMPLOYEE'],
+            subItems: [],
+          }
+        ],
+      }
+    ],
+  }
 ]
 // {
 //   label: 'Inicio',
