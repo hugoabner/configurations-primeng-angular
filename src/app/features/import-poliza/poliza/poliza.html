@@ -1,10 +1,10 @@
 <main class="p-4 h-full">
   <!-- Contenedor con borde bonito, sombra y redondeado -->
   <div
-    class="border border-surface-200 dark:border-surface-800 
-    shadow-sm bg-surface-0 dark:bg-surface-900 "
+    class=""
   >
     <p-table
+      class="border-collapse border border-surface-200 dark:border-surface-800"
       #dt2
       [resizableColumns]="true"
       columnResizeMode="expand"
@@ -573,7 +573,7 @@
       <!-- Empty Message -->
       <ng-template #emptymessage>
         <tr>
-          <td colspan="5">No customers found.</td>
+          <td colspan="20">No records found</td>
         </tr>
       </ng-template>
     </p-table>
