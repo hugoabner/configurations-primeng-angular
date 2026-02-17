@@ -1,0 +1,5 @@
+td, th {
+  white-space: nowrap;       /* Evita que el texto se divida en varias líneas */
+  overflow: hidden;          /* Oculta el contenido que se desborda */
+  text-overflow: ellipsis;   /* Muestra puntos suspensivos para el contenido truncado */
+}
