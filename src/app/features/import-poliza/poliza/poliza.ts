@@ -1,13 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Button } from "primeng/button";
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { SelectModule } from 'primeng/select';
-import { Table, TableModule } from 'primeng/table';
+import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
+import { Tooltip } from "primeng/tooltip";
 import { CustomerService } from '../../../core/services/customer-service';
 import { COLUMNS_POLIZA_TABLE } from './constants/poliza-constants';
 
@@ -65,6 +67,11 @@ export interface Poliza {
   resultado_mensaje: string;
 }
 
+
+interface Column {
+    field: string;
+    header: string;
+}
 @Component({
   selector: 'app-poliza',
   imports: [
@@ -77,12 +84,17 @@ export interface Poliza {
     TagModule,
     InputTextModule,
     FormsModule,
-  ],
+    Button,
+    Tooltip,
+],
   templateUrl: './poliza.html',
   styleUrl: './poliza.css',
   providers: [CustomerService]
 })
 export class Poliza implements OnInit {
+
+
+  
   private customerService = inject(CustomerService);
   customers!: Poliza[];
   representatives!: any[];
@@ -90,61 +102,22 @@ export class Poliza implements OnInit {
   loading: boolean = true;
   activityValues: number[] = [0, 100];
 
-  COLUMNS_POLIZA_TABLE = COLUMNS_POLIZA_TABLE;
+  cols!: Column[];
+  selectedColumns!: Column[];
   ngOnInit() {
+  
     this.customerService.getCustomersLarge().then((customers) => {
       this.customers = customers as Poliza[];
       this.loading = false;
       // this.customers.forEach((customer) => (customer. = new Date(<Date>customer.date)));
-    });
-    this.representatives = [
-      { name: 'Amy Elsner', image: 'amyelsner.png' },
-      { name: 'Anna Fali', image: 'annafali.png' },
-      { name: 'Asiya Javayant', image: 'asiyajavayant.png' },
-      { name: 'Bernardo Dominic', image: 'bernardodominic.png' },
-      { name: 'Elwin Sharvill', image: 'elwinsharvill.png' },
-      { name: 'Ioni Bowcher', image: 'ionibowcher.png' },
-      { name: 'Ivan Magalhaes', image: 'ivanmagalhaes.png' },
-      { name: 'Onyama Limba', image: 'onyamalimba.png' },
-      { name: 'Stephen Shaw', image: 'stephenshaw.png' },
-      { name: 'Xuxue Feng', image: 'xuxuefeng.png' },
-    ];
-    this.statuses = [
-      { label: 'Unqualified', value: 'unqualified' },
-      { label: 'Qualified', value: 'qualified' },
-      { label: 'New', value: 'new' },
-      { label: 'Negotiation', value: 'negotiation' },
-      { label: 'Renewal', value: 'renewal' },
-      { label: 'Proposal', value: 'proposal' },
-    ];
+    });  
+    this.cols = COLUMNS_POLIZA_TABLE;
+    this.selectedColumns = [...this.cols]; // Inicialización con todas las columnas
   }
-
-  clear(table: Table) {
-    table.clear();
-  }
-
-  getSeverity(status: string) {
-    switch (status) {
-      case 'unqualified':
-        return 'danger';
-
-      case 'qualified':
-        return 'success';
-
-      case 'new':
-        return 'info';
-
-      case 'negotiation':
-        return 'warn';
-
-      case 'renewal':
-        return null;
-
-      case 'proposal':
-        return null;
-
-      default:
-        return null;
-    }
+  onColumnChange(selected: Column[]) {
+    // Ordena las columnas seleccionadas según el orden original de 'cols'
+    this.selectedColumns = this.cols.filter((col) =>
+      selected.some((v) => v.field === col.field)
+    );
   }
 }

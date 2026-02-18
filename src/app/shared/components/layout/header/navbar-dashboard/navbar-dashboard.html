@@ -1,14 +1,22 @@
 <nav
-  class="sticky z-10 top-0 flex items-center border-b border-surface-200 dark:border-surface-700  
-  h-16 w-full mx-auto justify-between px-4 shadow-xs
-  dark:bg-surface-900 bg-surface-50 
-  "
+  class="sticky z-10 top-0 flex items-center border-b border-surface-200 dark:border-surface-700 h-16 w-full mx-auto justify-between px-4 shadow-xs dark:bg-surface-900 bg-surface-50"
 >
   <app-sidebar-trigger-main />
-  <div class="flex gap-4">
-    <!-- <p-button pTooltip="Logout" icon="pi pi-sign-out" size="small"></p-button>
-    <p-button class="" label="Check" size="small" /> -->
-    <p-button [icon]="isDark ? 'pi pi-sun' : 'pi pi-moon'" size="small" (onClick)="toggleDarkMode()" />
+  <div class="flex items-center gap-6">
+    <div class="mt-2">
+      <p-overlaybadge [value]="2" [badgeSize]="'small'" severity="danger">
+        <i class="pi pi-bell" style="font-size: 1.45rem; cursor: pointer"></i>
+      </p-overlaybadge>
+    </div>
+    <div class="">
+      <p-button
+        [variant]="'outlined'"
+        [icon]="isDark ? 'pi pi-sun' : 'pi pi-moon'"
+        size="small"
+        (onClick)="toggleDarkMode()"
+      />
+    </div>
+
     <!-- <button
       type="button"
       class="bg-emerald-400 p-3 rounded-2xl text-white hover:bg-green-600 cursor-pointer"

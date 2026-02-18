@@ -3,3 +3,4 @@ td, th {
   overflow: hidden;          /* Oculta el contenido que se desborda */
   text-overflow: ellipsis;   /* Muestra puntos suspensivos para el contenido truncado */
 }
+
