@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { RouterLink, RouterModule } from '@angular/router';
-import { NavItem } from '../../../../../core/types/interface-sidebar';
+import { NavItem } from '../../../../../core/interfaces/interface-sidebar';
 
 @Component({
   selector: 'app-sidebar-submenu',

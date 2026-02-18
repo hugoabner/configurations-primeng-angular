@@ -1,75 +1,65 @@
- <div class="relative">
-      <a
-        [routerLink]="!hasSubItems() ? item.href : null"
-        [routerLinkActive]="!hasSubItems() ? 'active' : ''"
-        [routerLinkActiveOptions]="{ exact: item.exact || false }"
-        (click)="hasSubItems() ? toggle.emit(item) : navigate.emit(item)"
-        class="flex items-center rounded-lg p-2 text-sm transition-all duration-200
-        hover:bg-primary-50 dark:hover:bg-primary-900/30
-        hover:text-primary-700 dark:hover:text-primary-300
-        hover:translate-x-1 cursor-pointer"
-        [class.bg-primary-50]="
-          (!hasSubItems() && isLinkActive()) ||
-          (hasSubItems() && isSubmenuActive())
-        "
-        [class.dark:bg-primary-900/30]="
-          (!hasSubItems() && isLinkActive()) ||
-          (hasSubItems() && isSubmenuActive())
-        "
-        [class.text-primary-700]="
-          (!hasSubItems() && isLinkActive()) ||
-          (hasSubItems() && isSubmenuActive())
-        "
-        [class.dark:text-primary-300]="
-          (!hasSubItems() && isLinkActive()) ||
-          (hasSubItems() && isSubmenuActive())
-        "
-        [class.font-medium]="
-          (!hasSubItems() && isLinkActive()) ||
-          (hasSubItems() && isSubmenuActive())
-        "
-      >
-        <!-- Indicador visual de nivel -->
-        @for (i of [].constructor(level); track i) {
-          <span class="w-4"></span>
-        }
-        
-        <!-- Indicador de item activo -->
-        @if (!hasSubItems() && isLinkActive()) {
-          <span class="w-1 h-1 rounded-full bg-primary-500 mr-2"></span>
-        }
-        
-        @if (item.icon) {
-          <i [ngClass]="item.icon" class="mr-2 text-sm"></i>
-        }
-        
-        <span class="truncate flex-1" [class.ml-3]="!hasSubItems() && !isLinkActive() && !item.icon">
-          {{ item.label }}
-        </span>
-        
-        @if (hasSubItems()) {
-          <i
-            class="ml-auto text-xs transition-all duration-200"
-            [ngClass]="isExpanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
-          ></i>
-        }
-      </a>
-      
-      <!-- Subitems recursivos -->
-      @if (hasSubItems() && isExpanded) {
-        <ul class="ml-4 mt-1 space-y-1">
-          @for (subItem of item.subItems; track subItem.href) {
-            <li>
-              <app-sidebar-submenu
-                [item]="subItem"
-                [desktopOpen]="desktopOpen"
-                [level]="level + 1"
-                [isExpanded]="isExpanded"
-                (navigate)="navigate.emit($event)"
-                (toggle)="toggle.emit($event)"
-              />
-            </li>
-          }
-        </ul>
+<div class="relative">
+  <a
+    [routerLink]="!hasSubItems() ? item.href : null"
+    [routerLinkActive]="!hasSubItems() ? 'active' : ''"
+    [routerLinkActiveOptions]="{ exact: item.exact || false }"
+    (click)="hasSubItems() ? toggle.emit(item) : navigate.emit(item)"
+    class="flex items-center rounded-lg p-2 text-sm transition-all duration-200 hover:bg-primary-50 dark:hover:bg-primary-900/30 hover:text-primary-700 dark:hover:text-primary-300 hover:translate-x-1 cursor-pointer"
+    [class.bg-primary-50]="
+      (!hasSubItems() && isLinkActive()) || (hasSubItems() && isSubmenuActive())
+    "
+    [class.dark:bg-primary-900/30]="
+      (!hasSubItems() && isLinkActive()) || (hasSubItems() && isSubmenuActive())
+    "
+    [class.text-primary-700]="
+      (!hasSubItems() && isLinkActive()) || (hasSubItems() && isSubmenuActive())
+    "
+    [class.dark:text-primary-300]="
+      (!hasSubItems() && isLinkActive()) || (hasSubItems() && isSubmenuActive())
+    "
+    [class.font-medium]="(!hasSubItems() && isLinkActive()) || (hasSubItems() && isSubmenuActive())"
+  >
+    <!-- Indicador visual de nivel -->
+    @for (i of [].constructor(level); track i) {
+      <span class="w-4"></span>
+    }
+
+    <!-- Indicador de item activo -->
+    @if (!hasSubItems() && isLinkActive()) {
+      <span class="w-1 h-1 rounded-full bg-primary-500 mr-2"></span>
+    }
+
+    @if (item.icon) {
+      <i [ngClass]="item.icon" class="mr-2 text-sm"></i>
+    }
+
+    <span class="truncate flex-1" [class.ml-3]="!hasSubItems() && !isLinkActive() && !item.icon">
+      {{ item.label }}
+    </span>
+
+    @if (hasSubItems()) {
+      <i
+        class="ml-auto text-xs transition-all duration-200"
+        [ngClass]="isExpanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
+      ></i>
+    }
+  </a>
+
+  <!-- Subitems recursivos -->
+  @if (hasSubItems() && isExpanded) {
+    <ul class="ml-4 mt-1 space-y-1">
+      @for (subItem of item.subItems; track subItem.href) {
+        <li>
+          <app-sidebar-submenu
+            [item]="subItem"
+            [desktopOpen]="desktopOpen"
+            [level]="level + 1"
+            [isExpanded]="isExpanded"
+            (navigate)="navigate.emit($event)"
+            (toggle)="toggle.emit($event)"
+          />
+        </li>
       }
-    </div>
+    </ul>
+  }
+</div>

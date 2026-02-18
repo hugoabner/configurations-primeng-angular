@@ -3,8 +3,8 @@ import { Component, ElementRef, inject, Input, OnDestroy, signal } from '@angula
 import { Router, RouterLink, RouterModule } from '@angular/router';
 import { TooltipModule } from 'primeng/tooltip';
 import { Subscription } from 'rxjs';
+import { NavItem, SidebarGroup } from '../../../../../core/interfaces/interface-sidebar';
 import { SidebarService } from '../../../../../core/services/sidebar-service/sidebar-service';
-import { NavItem, SidebarGroup } from '../../../../../core/types/interface-sidebar';
 import { SidebarSubmenu } from "../sidebar-submenu/sidebar-submenu";
 type MenuItem = {
   readonly label: string;

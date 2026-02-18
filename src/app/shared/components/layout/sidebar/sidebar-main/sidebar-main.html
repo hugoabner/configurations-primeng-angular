@@ -1,35 +1,32 @@
 <div
-  class="hidden md:block 
-  bg-surface-50 dark:bg-surface-900 
-  border-surface-200 dark:border-surface-700 border-r 
-  fixed h-full left-0 transition-all duration-400"
-  [ngClass]="desktopOpen ? 'w-60 ' : 'w-20'"
+  class="hidden md:block bg-surface-50 dark:bg-surface-900 
+  border-surface-200 dark:border-surface-700 border-r fixed 
+  h-full left-0 transition-all duration-400"
+  [ngClass]="desktopOpen ? 'w-60 ' : 'w-24'"
 >
-  <!-- [ngClass]="{ 'translate-x-0': desktopOpen, '-translate-x-47': !desktopOpen }" -->
   <div class="h-full flex flex-col justify-between">
+    <!-- Header section -->
     <section class="py-3">
-      <!-- en dark esta bien, pero el light no se ve la lettra por que es blanca -->
       <img
         src="https://karlossegurosdeautos.com/dist/img/logocolor.png"
         alt="Logo"
         class="mx-auto transition-all duration-300"
         [ngClass]="desktopOpen ? 'block w-48 h-14' : 'hidden'"
       />
-      <!-- en collapsed block y en expanded hidden -->
       <img
         src="https://karlosseguros.com.pe/_next/image?url=%2Fimg%2Flogoavatar.png&w=96&q=75"
         alt="Logo"
-        class="mx-auto transition-all duration-300" 
+        class="mx-auto transition-all duration-300"
         [ngClass]="!desktopOpen ? 'block w-9' : 'hidden'"
       />
     </section>
-    <!--  scrooll delgado -->
-    <div class="px-3 py-1.5 flex-1 overflow-y-auto scroll-mr-96 custom-scrollbar">
-      <!-- body -->
-      <section class="h-full">
+    <!-- Body section -->
+    <section class="px-3 py-1.5 flex-1 overflow-y-auto scroll-mr-96 custom-scrollbar">
+      <div class="h-full">
         <app-sidebar-navigation [menuGroups]="menuItems" />
-      </section>
-    </div>
+      </div>
+    </section>
+    <!-- Footer section -->
     <section class="">footer1</section>
   </div>
 </div>
@@ -44,55 +41,30 @@
     ></button>
 
     <!-- panel -->
-    <aside class="relative w-72 
-    bg-surface-50 dark:bg-surface-900 
-    border-surface-200 dark:border-surface-700 border-r  
-    shadow-xl h-full transition-all duration-400"
-    [ngClass]="mobileOpen ? ' animate-fadeinleft' : 'animate-fadeinright ' "
+    <aside
+      class="relative w-72 bg-surface-50 dark:bg-surface-900 
+      border-surface-200 dark:border-surface-700 
+      border-r shadow-xl h-full transition-all duration-400"
+      [ngClass]="mobileOpen ? ' animate-fadeinleft' : 'animate-fadeinright '"
     >
       <div class="h-full flex flex-col">
-        <div class="p-4 flex items-center justify-end
-        border-b border-surface-200 dark:border-surface-700 ">
-          <!-- header -->
-          <p-button
-            icon="pi pi-times"
-            size="small"
-            (click)="closeMobile()"
-          ></p-button>
-        </div>
-        <div class="p-4 flex-1 overflow-auto">
-          <!-- body -->
-          <section class="h-full">
+        <!-- header -->
+        <section
+          class="p-4 flex items-center justify-end border-b border-surface-200 dark:border-surface-700"
+        >
+          <p-button icon="pi pi-times" size="small" (click)="closeMobile()"></p-button>
+        </section>
+        <!-- body -->
+        <section class="p-4 flex-1 overflow-auto">
+          <div class="h-full">
             <app-sidebar-navigation [menuGroups]="menuItems" />
-          </section>
-        </div>
-        <div class="p-4 border-t border-surface-200 dark:border-surface-700">
-          <!-- footer -->
-          <section class="">footer2</section>
-        </div>
+          </div>
+        </section>
+        <!-- footer -->
+        <section class="p-4 border-t border-surface-200 dark:border-surface-700">
+          <div class="">footer2</div>
+        </section>
       </div>
     </aside>
   </div>
 }
-
-<!-- <dialog class="md:hidden fixed inset-0 z-30 flex">
-    <button
-      class="absolute inset-0 bg-black/40"
-      aria-label="Close sidebar"
-      (click)="closeMobile()"
-    ></button>
-
-    <aside class="relative w-72 bg-white shadow-xl h-full">
-      <div class="h-full flex flex-col">
-        <div class="p-4 border-b">
-          <button (click)="closeMobile()" class="text-sm">Cerrar</button>
-        </div>
-        <div class="p-4 flex-1 overflow-auto">
-          <section class="bg-yellow-500 h-full">body</section>
-        </div>
-        <div class="p-4 border-t">
-          <section class="bg-blue-500">footer</section>
-        </div>
-      </div>
-    </aside>
-  </dialog> -->

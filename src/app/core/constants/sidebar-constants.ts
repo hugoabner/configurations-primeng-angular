@@ -1,8 +1,8 @@
-import { SidebarGroup } from '../types/interface-sidebar';
+import { SidebarGroup } from '../interfaces/interface-sidebar';
 
 export const MENU_ITEMS: SidebarGroup[] = [
   {
-    title: 'Dashboard',
+    title: 'Procesos',
     items: [
       {
         label: 'Polizas',

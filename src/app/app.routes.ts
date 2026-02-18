@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { DashboardLayout } from './layout-page/dashboard-layout/dashboard-layout';
+import { DashboardLayout } from './layouts/dashboard-layout/dashboard-layout';
 
 export const routes: Routes = [
   {
@@ -14,7 +14,7 @@ export const routes: Routes = [
         pathMatch: 'full', // | prefix
         title: 'Pólizas | Karlos Seguros',
         path: 'polizas',
-        loadComponent: () => import('./features/import-poliza/poliza/poliza').then((m) => m.Poliza),
+        loadComponent: () => import('./features/process-features/import-poliza-process-feature/poliza/poliza').then((m) => m.Poliza),
       },
       // Opción A: 404 dentro del Layout
       {

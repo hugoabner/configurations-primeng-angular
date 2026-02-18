@@ -1,3 +1,4 @@
+<p-toast [position]="'bottom-right'" />
 <main class="p-4 h-full">
   <!-- Contenedor con borde bonito, sombra y redondeado -->
   <div class="">
@@ -7,19 +8,16 @@
       [resizableColumns]="true"
       columnResizeMode="expand"
       [columns]="selectedColumns"
+      [scrollable]="true"
+      scrollHeight="530px"
       [showGridlines]="true"
-      [value]="customers"
-      dataKey="renovacion_id"
+      [value]="history_polizas"
+      dataKey="TIPODOC"
       [rows]="10"
       [rowsPerPageOptions]="[10, 15, 25, 50]"
       [loading]="loading"
       [paginator]="true"
-      [globalFilterFields]="[
-        'renovacion_id',
-        'tipo_documento',
-        'numero_documento',
-        'nombre_aseguradora',
-      ]"
+      [globalFilterFields]="['DOCUMENTO', 'ASEGURADO', 'CONTRATANTE', 'ENDOSATARIO']"
       [tableStyle]="{ 'min-width': '75rem' }"
     >
       <!-- Caption -->
@@ -79,6 +77,20 @@
             <th pResizableColumn>{{ col.header }}</th>
           }
         </tr>
+        <tr>
+          @for (col of columns; track col.field) {
+            <th>
+              <p-columnFilter
+                class="z-0"
+                type="text"
+                field="{{ col.field }}"
+                placeholder="Type to search"
+                ariaLabel="Filter Name"
+                filterOn="input"
+              ></p-columnFilter>
+            </th>
+          }
+        </tr>
       </ng-template>
       <!-- Body -->
       <ng-template #body let-customer let-columns="columns">
@@ -91,7 +103,7 @@
       <!-- Empty Message -->
       <ng-template #emptymessage>
         <tr>
-          <td colspan="20">No records found</td>
+          <td colspan="35" class="text-center text-2xl">No se encontraron registros</td>
         </tr>
       </ng-template>
       <!-- paginator  left  -->

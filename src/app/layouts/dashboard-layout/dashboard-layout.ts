@@ -17,7 +17,7 @@ import { SidebarMain } from '../../shared/components/layout/sidebar/sidebar-main
       <main
         class="transition-all duration-400"
         [ngClass]="
-          desktopOpen ? 'flex-1 md:ml-60 h-full' : 'flex-1 md:ml-20 h-full'
+          desktopOpen ? 'flex-1 md:ml-60 h-full' : 'flex-1 md:ml-24 h-full'
         "
       >
         <app-navbar-dashboard />

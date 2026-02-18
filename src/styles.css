@@ -11,7 +11,7 @@
 }/* padding: 2rem 0; */
 
 html {
-  font-size: 14px;
+  font-size: 13.7px;
 }
 
 /* body {
@@ -24,5 +24,25 @@ html {
   color: var(--body-text-color);
 } */
 
+/* Estilo para navegadores basados en Webkit (Chrome, Safari, Edge) */
 
+/* Estilo para Firefox */
+/* * {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+} */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
     
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+    
+::-webkit-scrollbar-thumb {
+  /* zinc.500 */
+  background-color: #a1a1aa;
+  border-radius: 10px;
+  border: 1px solid transparent;
+}

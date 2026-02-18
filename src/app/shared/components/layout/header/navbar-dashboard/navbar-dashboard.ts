@@ -12,9 +12,9 @@ import { SidebarTriggerMain } from '../../sidebar/sidebar-trigger-main/sidebar-t
 })
 export class NavbarDashboard {
   isDark = false;
-toggleDarkMode() {
+  toggleDarkMode() {
     this.isDark = !this.isDark;
     const element = document.querySelector('html');
     element?.classList.toggle('my-app-dark');
-}
+  }
 }
