@@ -120,4 +120,5 @@ export class Poliza implements OnInit {
       selected.some((v) => v.field === col.field)
     );
   }
+
 }
