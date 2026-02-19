@@ -6,13 +6,11 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Prerender
   },
   {
-    path: 'not-found', // Prerenderizamos la página de error para que sea instantánea
+    path: 'not-found',
     renderMode: RenderMode.Prerender
   },
   {
     path: '**', 
-    // Cambiamos a Server para que el servidor de Angular 
-    // procese la ruta inexistente y ejecute el { path: '**', redirectTo: 'not-found' }
-    renderMode: RenderMode.Server 
+    renderMode: RenderMode.Prerender 
   }
 ];
