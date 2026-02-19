@@ -13,6 +13,6 @@ export const serverRoutes: ServerRoute[] = [
     path: '**', 
     // En producción, las rutas inexistentes suelen manejarse en el cliente
     // o mediante SSR para devolver un código de estado 404 real.
-    renderMode: RenderMode.Server 
+    renderMode: RenderMode.Client 
   }
 ];
