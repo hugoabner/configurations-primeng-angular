@@ -1,6 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { map, Observable, of, switchMap, tap } from 'rxjs';
+import * as XLSX from 'xlsx';
 import { environment } from '../../../../environments/environment.development';
 import { API_ENDPOINTS } from '../../constants/api-endpoint-constants';
 import {
@@ -109,5 +110,15 @@ export class BucketService {
       sizeBytes: parseInt(item.size, 10),
       user: meta.createdBy,
     };
+  }
+
+  public exportToExcel(data: any[], fileName: string): void {
+    const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(data);
+    const workbook: XLSX.WorkBook = {
+      Sheets: { 'Datos': worksheet},
+      SheetNames: ['Datos']
+    }
+    XLSX.writeFile(workbook, `${fileName}.xlsx`);
+    // { bookType: 'xlsx', type: 'array' }
   }
 }

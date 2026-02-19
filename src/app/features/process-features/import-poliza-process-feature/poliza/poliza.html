@@ -53,14 +53,11 @@
                     }
                   </div>
                 } @else {
-                  <div class="flex flex-col gap-1 
-                  overflow-auto pr-2 max-h-125">
+                  <div class="flex flex-col gap-1 overflow-auto pr-2 max-h-125">
                     @for (batch of importBatchHistory; track batch.id) {
                       <div
-                      (click)="loadBatchDetail(batch)"
-                        class="flex p-2 rounded-md cursor-pointer
-                        hover:bg-surface-100 dark:hover:bg-surface-700
-                        transition-colors duration-200 gap-3 items-center"
+                        (click)="loadBatchDetail(batch)"
+                        class="flex p-2 rounded-md cursor-pointer hover:bg-surface-100 dark:hover:bg-surface-700 transition-colors duration-200 gap-3 items-center"
                       >
                         <div class="shrink-0">
                           <i
@@ -83,9 +80,7 @@
                         </div>
                       </div>
                     } @empty {
-                      <div class="p-8 text-center text-muted-color">
-                        No hay batches disponibles
-                      </div>
+                      <div class="p-8 text-center text-muted-color">No hay batches disponibles</div>
                     }
                   </div>
                 }
@@ -101,12 +96,13 @@
             size="small"
           />
           <p-button
-            pTooltip="Ver excel original de importacion de Polizas"
+            pTooltip="Ver excel original"
             icon="pi pi-file-excel"
             [raised]="true"
             severity="success"
             tooltipPosition="bottom"
             size="small"
+            (click)="viewOriginalExcel()"
           />
 
           <p-button
@@ -116,6 +112,7 @@
             severity="success"
             tooltipPosition="bottom"
             size="small"
+            (click)="exportExcel(dt2._value)"
           />
           <p-iconfield iconPosition="left" class="">
             <p-inputicon>
@@ -154,10 +151,16 @@
         </tr>
       </ng-template>
       <!-- Body -->
-      <ng-template #body let-customer let-columns="columns">
+      <ng-template #body let-poliza let-columns="columns">
         <tr>
           @for (col of columns; track col.field) {
-            <td>{{ customer[col.field] }}</td>
+            <td>
+              @if (col.field === 'ASEGURADO' || col.field === 'CONTRATANTE' || col.field === 'ENDOSATARIO') {
+                {{ poliza[col.field] | titlecase }}
+              } @else {
+                {{ poliza[col.field] }}
+              }
+            </td>
           }
         </tr>
       </ng-template>

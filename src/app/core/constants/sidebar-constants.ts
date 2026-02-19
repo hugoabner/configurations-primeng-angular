@@ -2,15 +2,30 @@ import { SidebarGroup } from '../interfaces/interface-sidebar';
 
 export const MENU_ITEMS: SidebarGroup[] = [
   {
-    title: 'Procesos',
+    title: 'Procesos Batch',
     items: [
       {
-        label: 'Polizas',
+        label: 'Proceso Polizas',
         href: '/polizas',
         icon: 'pi pi-file',
         exact: true,
         roles: ['ADMIN', 'EMPLOYEE'],
-        subItems: [],
+        subItems: [
+          {
+            label: 'Importar Pólizas',
+            href: '/polizas/importar',
+            exact: true,
+            roles: ['ADMIN', 'EMPLOYEE'],
+            subItems: [],
+          },
+          {
+            label: 'Ver Polizas',
+            href: '/polizas/ver',
+            exact: true,
+            roles: ['ADMIN', 'EMPLOYEE'],
+            subItems: [],
+          },
+        ],
       }
     ],
   },

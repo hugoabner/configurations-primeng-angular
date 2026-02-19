@@ -83,9 +83,10 @@ export const COLUMNS_STORAGE_TABLE: Column[] = [
   { field: 'TIPO MONEDA', header: 'Tipo de Moneda' },
   { field: 'PRIMA NETA', header: 'Prima Neta' },
   { field: 'TASA', header: 'Tasa' },
-  // { field: 'FECHA ALERTA', header: 'Fecha de Alerta' },
+  // { field: 'FECHA ALERTA', header: 'Fecha de Alerta' }, 
   // { field: 'formaPago', header: 'Forma de Pago' },
   // { field: 'descPlanFinanciamiento', header: 'Descripción del Plan de Financiamiento' },
   // { field: 'nroCuotas', header: 'Número de Cuotas' },
   // { field: 'importeCuotas', header: 'Importe de Cuotas' },
 ];
+ 
