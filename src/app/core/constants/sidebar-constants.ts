@@ -8,62 +8,12 @@ export const MENU_ITEMS: SidebarGroup[] = [
         label: 'Proceso Polizas',
         href: '/polizas',
         icon: 'pi pi-file',
-        exact: true,
+        exact: false,
         roles: ['ADMIN', 'EMPLOYEE'],
-        subItems: [
-          {
-            label: 'Importar Pólizas',
-            href: '/polizas/importar',
-            exact: true,
-            roles: ['ADMIN', 'EMPLOYEE'],
-            subItems: [],
-          },
-          {
-            label: 'Ver Polizas',
-            href: '/polizas/ver',
-            exact: true,
-            roles: ['ADMIN', 'EMPLOYEE'],
-            subItems: [],
-          },
-        ],
+        subItems: [],
       }
     ],
   },
-  {
-    title: 'Configuración',
-    items: [
-      {
-        label: 'General',
-        href: '/configuracion/general',
-        icon: 'pi pi-cog',
-        exact: true,
-        roles: ['ADMIN', 'EMPLOYEE'],
-        subItems: [
-          {
-            label: 'Seguridad',
-            href: '/configuracion/seguridad',
-            exact: true,
-            roles: ['ADMIN', 'EMPLOYEE'],
-            subItems: [],
-          },
-          {
-            label: 'Notificaciones',
-            href: '/configuracion/notificaciones',
-            exact: true,
-            roles: ['ADMIN', 'EMPLOYEE'],
-            subItems: [],
-          },
-          {
-            label: 'Integraciones',
-            href: '/configuracion/integraciones',
-            exact: true,
-            roles: ['ADMIN', 'EMPLOYEE'],
-            subItems: [],
-          }
-        ],
-      }
-    ],
-  }
 ]
 // {
 //   label: 'Inicio',
