@@ -2,22 +2,17 @@
   class="hidden md:block bg-surface-50 dark:bg-surface-900 
   border-surface-200 dark:border-surface-700 border-r fixed 
   h-full left-0 transition-all duration-400"
-  [ngClass]="desktopOpen ? 'w-60 ' : 'w-24'"
+  [ngClass]="desktopOpen ? 'w-64' : 'w-24'"
 >
   <div class="h-full flex flex-col justify-between">
     <!-- Header section -->
-    <section class="py-3">
+    <section class="py-3 h-20 flex items-center justify-center">
+      <!-- src="https://karlossegurosdeautos.com/dist/img/logocolor.png" -->
       <img
-        src="https://karlossegurosdeautos.com/dist/img/logocolor.png"
+        [src]="desktopOpen ? 'https://karlossegurosdeautos.com/dist/img/logocolor.png' : 'https://karlosseguros.com.pe/_next/image?url=%2Fimg%2Flogoavatar.png&w=96&q=75'"
         alt="Logo"
         class="mx-auto transition-all duration-300"
-        [ngClass]="desktopOpen ? 'block w-48 h-14' : 'hidden'"
-      />
-      <img
-        src="https://karlosseguros.com.pe/_next/image?url=%2Fimg%2Flogoavatar.png&w=96&q=75"
-        alt="Logo"
-        class="mx-auto transition-all duration-300"
-        [ngClass]="!desktopOpen ? 'block w-9' : 'hidden'"
+        [ngClass]="desktopOpen ? 'w-48 mt-2' : 'h-10'"
       />
     </section>
     <!-- Body section -->
