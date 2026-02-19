@@ -16,13 +16,12 @@ export const routes: Routes = [
             (m) => m.Poliza,
           ),
       },
-      // {
-      //   title: 'Página no encontrada | Karlos Seguros',
-      //   path: 'not-found',
-      //   loadComponent: () => import('./features/not-found/not-found').then((m) => m.NotFound),
-      // },
+      {
+        path: 'not-found',
+        loadComponent: () =>
+          import('./features/not-found/not-found').then((m) => m.NotFound),
+      },
     ],
   },
-  // si la ruta no coincide con ninguna de las anteriores, redirige a 'not-found' para mostrar la página de error
-  // { path: '**', redirectTo: 'not-found' },
+  { path: '**', redirectTo: 'not-found' }
 ];
