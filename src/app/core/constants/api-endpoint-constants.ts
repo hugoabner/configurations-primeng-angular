@@ -6,6 +6,10 @@ export const API_ENDPOINTS = {
 		LOGOUT: '/auth/logout',
 		REFRESH_TOKEN: '/auth/refresh-token',
 	},
+	STORAGE_BUCKET: {
+		IMPORT_BATCH_DETAIL: '/download/storage/v1/b/gerenciariesgos-1-bucket/o',
+		IMPORT_BATCH_HISTORY: '/storage/v1/b/gerenciariesgos-1-bucket/o',
+	}
 } as const;
 
 export const API_VERSIONS = {

@@ -7,10 +7,14 @@
  */
 export const environment = {
   production: false,
+  /**
+   * URL de la API de Karlos Seguros de Autos
+   */
   apiUrl: 'https://www.karlossegurosdeautos.com',
-  bucketUrl: 'https://storage.googleapis.com/download/storage/v1',
-  // GCS_BUCKET_URL
-  gcsBucketUrl: 'https://storage.googleapis.com/download/storage/v1/b/gerenciariesgos-1-bucket/o',
+  /**
+   * URL del bucket de Google Cloud Storage para acceder a los archivos de pólizas
+   */
+  gcsBucketUrl: 'https://storage.googleapis.com',
   auth: {
     username: 'KarlosBot',
     password: 'P$072@Z0$3y0@OOr',
