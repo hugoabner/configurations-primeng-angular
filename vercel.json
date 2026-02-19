@@ -11,10 +11,18 @@
       ]
     }
   ],
+  "version": 2,
+  "public": true,
+  "name": "control-de-procesos",
   "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "/api/main"
+      "destination": "/api"
     }
-  ]
+  ],
+  "functions": {
+    "api/index.js": {
+      "includeFiles": "dist/control-de-procesos/**"
+    }
+  }
 }
