@@ -72,6 +72,12 @@ export class Poliza implements OnInit {
     this.activatedRoute.queryParams.subscribe((params) => {
       const cache = params['cache'];
       const nameHistory = params['name_history'];
+      // si no existe name_history no hacemos nada, porque no sabemos qué historial cargar
+      if (!nameHistory) {
+        this.loading = false;
+        
+        return;
+      }
       this.loadDataFromBucket(nameHistory, Boolean(cache));
     });
   }
@@ -212,7 +218,7 @@ export class Poliza implements OnInit {
     // abrir en otro navegador la ruta /polizasBatch/excel/{fileName}
     window.open(
       environment.gcsBucketUrl +
-        "https://storage.googleapis.com/gerenciariesgos-1-bucket" +
+        'https://storage.googleapis.com/gerenciariesgos-1-bucket' +
         `/polizasBatch/excel/${firstItem?.fileName || ''}`,
       '_blank',
     );
@@ -220,5 +226,4 @@ export class Poliza implements OnInit {
     // this.router.navigate(['../polizasBatch/excel/' + firstItem?.fileName], { relativeTo: this.activatedRoute });
     // /polizasBatch/excel/PRUEBA_2026-02-12 14:45:59
   }
-
 }
