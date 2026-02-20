@@ -88,8 +88,9 @@ export class Poliza implements OnInit {
       const nameHistory = params['name_history'];
       // si no existe name_history no hacemos nada, porque no sabemos qué historial cargar
       if (!nameHistory) {
+        this.history_polizas.set([]);
+        this.importBatchHistory = [];
         this.loading = false;
-
         return;
       }
       this.loadDataFromBucket(nameHistory, Boolean(cache));
