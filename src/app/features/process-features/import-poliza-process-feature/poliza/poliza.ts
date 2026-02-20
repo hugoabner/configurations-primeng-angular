@@ -52,30 +52,44 @@ interface Column {
   providers: [MessageService, PopoverModule],
 })
 export class Poliza implements OnInit {
-  private activatedRoute = inject(ActivatedRoute);
-  private bucketService = inject(BucketService);
-  private messageService = inject(MessageService);
-  private router = inject(Router);
+  private _activatedRoute = inject(ActivatedRoute);
+  private _bucketService = inject(BucketService);
+  private _messageService = inject(MessageService);
+  private _router = inject(Router);
 
   constructor(private cdr: ChangeDetectorRef) {}
 
   history_polizas = signal<ExcelData[]>([]);
-  representatives!: any[];
   statuses!: any[];
   loading: boolean = true;
   activityValues: number[] = [0, 100];
 
   cols: Column[] = COLUMNS_STORAGE_TABLE;
   selectedColumns: Column[] = COLUMNS_STORAGE_TABLE;
-
+  documentOptions: any[] = [];
+  value1: any;
   ngOnInit() {
-    this.activatedRoute.queryParams.subscribe((params) => {
+    this.documentOptions = [
+      { name: 'DNI', value: 'DNI' },
+      { name: 'RUC', value: 'RUC' },
+      { name: 'RUC17', value: 'RUC17' },
+      { name: 'RUC10', value: 'RUC10' },
+      { name: 'RUC11', value: 'RUC11' },
+      { name: 'RUC12', value: 'RUC12' },
+      { name: 'RUC13', value: 'RUC13' },
+      { name: 'RUC14', value: 'RUC14' },
+      { name: 'RUC20', value: 'RUC20' },
+      { name: 'CEX', value: 'CEX' },
+      { name: 'RUC15', value: 'RUC15' },
+      { name: 'PASAP', value: 'PASAP' },
+    ];
+    this._activatedRoute.queryParams.subscribe((params) => {
       const cache = params['cache'];
       const nameHistory = params['name_history'];
       // si no existe name_history no hacemos nada, porque no sabemos qué historial cargar
       if (!nameHistory) {
         this.loading = false;
-        
+
         return;
       }
       this.loadDataFromBucket(nameHistory, Boolean(cache));
@@ -88,7 +102,7 @@ export class Poliza implements OnInit {
 
   loadDataFromBucket(name: string, cache?: boolean) {
     this.loading = true;
-    this.bucketService.getImportBatchDetail(name, cache).subscribe({
+    this._bucketService.getImportBatchDetail(name, cache).subscribe({
       next: (data: ExcelData[]) => {
         this.history_polizas.set(data);
         this.loading = false;
@@ -96,7 +110,7 @@ export class Poliza implements OnInit {
       },
       error: (err) => {
         this.loading = false;
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: err.message });
+        this._messageService.add({ severity: 'error', summary: 'Error', detail: err.message });
       },
     });
   }
@@ -112,13 +126,13 @@ export class Poliza implements OnInit {
 
   private loadHistory() {
     this.loadingHistory.set(true);
-    this.bucketService
+    this._bucketService
       .getImportBatchHistory()
       .pipe(finalize(() => this.loadingHistory.set(false)))
       .subscribe({
         next: (data) => (this.importBatchHistory = data),
         error: (err) => {
-          this.messageService.add({
+          this._messageService.add({
             severity: 'error',
             summary: 'Error',
             detail: 'Ups, ocurrió un error al cargar el historial.',
@@ -127,12 +141,9 @@ export class Poliza implements OnInit {
       });
   }
 
-  // signal para almacenar el historial seleccionado y mostrarlo en el componente de detalle
-  importBatchHistorySignal = signal<BatchHistoryItem | null>(null);
   public loadBatchDetail(batch: BatchHistoryItem) {
-    this.importBatchHistorySignal.set(batch);
-    this.router.navigate([], {
-      relativeTo: this.activatedRoute,
+    this._router.navigate([], {
+      relativeTo: this._activatedRoute,
       queryParams: {
         cache: 'true',
         name_history: encodeURIComponent(batch.id),
@@ -143,14 +154,13 @@ export class Poliza implements OnInit {
 
   public exportExcel(items: any[]) {
     if (!items || items.length === 0) {
-      this.messageService.add({
+      this._messageService.add({
         severity: 'warn',
         summary: 'Aviso',
         detail: 'No hay datos para exportar',
       });
       return;
     }
-
     // 1. Transformamos los datos técnicos a formato de "Usuario"
     const dataToExport = items.map((item) => ({
       TIPODOC: item.TIPODOC, // Asume que estas son tus keys en ExcelData
@@ -189,22 +199,18 @@ export class Poliza implements OnInit {
       'PRIMA NETA': item['PRIMA NETA'],
       TASA: item['TASA'],
     }));
-
     try {
       // 2. Generamos el nombre del archivo limpiando caracteres extraños
       const cleanName = `Reporte_Polizas_${new Date().toISOString().slice(0, 10)}.xlsx`;
-
       // 3. Enviamos al servicio que creamos antes
-      this.bucketService.exportToExcel(dataToExport, cleanName);
-
-      this.messageService.add({
+      this._bucketService.exportToExcel(dataToExport, cleanName);
+      this._messageService.add({
         severity: 'success',
         summary: 'Éxito',
         detail: `Excel "${cleanName}" generado con ${items.length} filas`,
       });
     } catch (error) {
-      console.error('Error exportando Excel', error);
-      this.messageService.add({
+      this._messageService.add({
         severity: 'error',
         summary: 'Error',
         detail: 'No se pudo generar el archivo Excel',
@@ -213,17 +219,40 @@ export class Poliza implements OnInit {
   }
 
   public viewOriginalExcel() {
-    // obtener el nombre del archivo original desde el primer item de history_polizas
-    const firstItem = this.importBatchHistorySignal();
-    // abrir en otro navegador la ruta /polizasBatch/excel/{fileName}
-    window.open(
+    const params = this._activatedRoute.snapshot.queryParams;
+    const nameHistory = params['name_history'];
+    // validar que name_history exista
+    if (!nameHistory) {
+      this._messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Selecciona un historial para poder ver el excel original.',
+      });
+      return;
+    }
+    const urlDecoded = decodeURIComponent(nameHistory);
+    const fileName = urlDecoded.split('/').pop() ?? ''; // ELIMINADAS_2026-01-27 22:59:09
+    const url =
       environment.gcsBucketUrl +
-        'https://storage.googleapis.com/gerenciariesgos-1-bucket' +
-        `/polizasBatch/excel/${firstItem?.fileName || ''}`,
-      '_blank',
-    );
-
-    // this.router.navigate(['../polizasBatch/excel/' + firstItem?.fileName], { relativeTo: this.activatedRoute });
-    // /polizasBatch/excel/PRUEBA_2026-02-12 14:45:59
+      '/gerenciariesgos-1-bucket' +
+      `/polizasBatch/excel/${decodeURIComponent(fileName) || ''}`;
+    //decodificar i saca extrer solo las iniciales polizasBatch/excel/
+    this._bucketService.generateUrl(url).subscribe({
+      next: (res) => {
+        if (res.url) {
+          window.open(
+            `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(res.url)}`,
+            '_blank',
+          );
+        }
+      },
+      error: (error) => {
+        this._messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: error.error.error || 'No se pudo generar la URL para el archivo original',
+        });
+      },
+    });
   }
 }

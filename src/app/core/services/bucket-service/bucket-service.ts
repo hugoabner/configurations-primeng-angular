@@ -9,48 +9,43 @@ import {
   ExcelData,
   StorageObject,
   StorageObjects,
-  StorageResponse
+  StorageResponse,
 } from '../../interfaces/interface-storage';
 import { AuthService } from '../auth-service/auth-service';
-
+interface GenerateUrlResponse {
+    mensaje: string
+    url: string
+  }
 @Injectable({
   providedIn: 'root',
 })
 export class BucketService {
-  private http = inject(HttpClient);
-  private authService = inject(AuthService);
+  /** injectables */
+  private _http = inject(HttpClient);
+  private _authService = inject(AuthService);
 
   private readonly GCS_BUCKET_URL = environment.gcsBucketUrl;
+  private readonly API_URL = environment.apiUrl;
 
-  // 1. El "Estado Privado" (La verdad de los datos)
   private _history = signal<BatchHistoryItem[]>([]);
-  // 2. El "Estado Publico" (Lo que la UI consume, inmutable)
   public history = this._history.asReadonly();
-  
+
   public lastLoaded = signal<Date | null>(null);
   private cacheDuration = 1 * 60 * 1000;
 
   private isCacheValid(): boolean {
     const last = this.lastLoaded();
     if (!last) return false;
-    return (new Date().getTime() - last.getTime()) < this.cacheDuration;
+    return new Date().getTime() - last.getTime() < this.cacheDuration;
   }
 
-
-  /**
-   *  @method getImportBatchDetail
-   * @description Obtiene los detalles de un batch específico desde el bucket de Google Cloud Storage.
-   * @param name El nombre del batch (archivo) a obtener.
-   * @param cache Si es true, se fuerza a usar la versión cacheada del archivo (si existe). Por defecto es false.
-   * @returns Observable<ExcelData[]> Un observable que emite un array de ExcelData con los detalles del batch.
-   */
   public getImportBatchDetail(name: string, cache: boolean = false): Observable<ExcelData[]> {
-    return this.authService.getGoogleToken().pipe(
+    return this._authService.getGoogleToken().pipe(
       switchMap((googleToken) => {
         const headers = new HttpHeaders().set('Authorization', `Bearer ${googleToken}`);
         const versionParam = cache ? '&v=1' : `&v=${Date.now()}`;
         const url = `${this.GCS_BUCKET_URL}/${API_ENDPOINTS.STORAGE_BUCKET.IMPORT_BATCH_DETAIL}/${name}?alt=media${versionParam}`;
-        return this.http.get<StorageResponse[]>(url, { headers });
+        return this._http.get<StorageResponse[]>(url, { headers });
       }),
       map((response) => this.processData(response)),
     );
@@ -59,33 +54,28 @@ export class BucketService {
   private processData(data: StorageResponse[]): ExcelData[] {
     return data.map((item) => {
       const ex = item.excel;
-      // Mapeo selectivo: solo extraemos lo que la tabla realmente va a mostrar
-      return { ...ex }; // Asegúrate de que PolizaRow tenga solo los campos necesarios
+      return { ...ex };
     });
   }
 
-  /**
-   * @method getImportBatchHistory
-   * @description Obtiene el historial de batches importados desde el bucket de Google Cloud Storage.
-   */
   public getImportBatchHistory(forceRefresh: boolean = false): Observable<BatchHistoryItem[]> {
     if (this.isCacheValid() && !forceRefresh) {
       return of(this._history());
     }
-    return this.authService.getGoogleToken().pipe(
+    return this._authService.getGoogleToken().pipe(
       switchMap((googleToken) => {
         const headers = new HttpHeaders().set('Authorization', `Bearer ${googleToken}`);
-        return this.http.get<StorageObjects>(
+        return this._http.get<StorageObjects>(
           `${this.GCS_BUCKET_URL}${API_ENDPOINTS.STORAGE_BUCKET.IMPORT_BATCH_HISTORY}?prefix=polizasBatch%2Fjson`,
           { headers },
         );
       }),
-      map((response) => response.items.map(item => this.mapStorageToBatchItem(item))),
+      map((response) => response.items.map((item) => this.mapStorageToBatchItem(item))),
       tap((data) => {
-        // 3. Efecto secundario acrualizamos el estado global
+        // 3. Efecto secundario para actualizar el estado privado
         this._history.set(data);
         this.lastLoaded.set(new Date());
-      })
+      }),
     );
   }
 
@@ -104,7 +94,6 @@ export class BucketService {
         success: successCount,
         error: parseInt(meta.error || '0', 10),
         total: totalCount,
-        // Calculamos el % de éxito para una barra de progreso
         accuracy: totalCount > 0 ? (successCount / totalCount) * 100 : 0,
       },
       sizeBytes: parseInt(item.size, 10),
@@ -115,10 +104,25 @@ export class BucketService {
   public exportToExcel(data: any[], fileName: string): void {
     const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(data);
     const workbook: XLSX.WorkBook = {
-      Sheets: { 'Datos': worksheet},
-      SheetNames: ['Datos']
-    }
+      Sheets: { Datos: worksheet },
+      SheetNames: ['Datos'],
+    };
     XLSX.writeFile(workbook, `${fileName}.xlsx`);
-    // { bookType: 'xlsx', type: 'array' }
+  }
+
+  public generateUrl(url: string): Observable<GenerateUrlResponse> {
+    if (!url) return of({ mensaje: 'No se pudo generar la URL', url: '' });
+    // metodo post enviar en el body el url y recibir el signedUrl
+    return this._authService.getKarlosToken().pipe(
+      switchMap((karlosToken) => {
+          const headers = new HttpHeaders().set('X-Auth-Token', karlosToken);
+        return this._http.post<GenerateUrlResponse>(
+          `${this.API_URL}/utilitarios/google/generateSignedUrl`,
+          { fileName: url  },
+          { headers },
+        );
+      }),
+      map((response) => response),
+    );
   }
 }
