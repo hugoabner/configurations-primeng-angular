@@ -5,6 +5,14 @@
 
 @custom-variant dark (&:where(.my-app-dark, .my-app-dark *));    
 
+
+
+.p-anchored-overlay-enter-active {
+    animation: demo-overlay-in 0ms ease-out;
+}
+.p-anchored-overlay-leave-active {
+    animation: demo-overlay-out 0ms ease-in;
+}
 /* html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
     Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';

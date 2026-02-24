@@ -51,8 +51,15 @@ export interface ExcelData {
 // Interfaz para los datos del array "antes"
 export interface AntesData {
   tipo: string;
-  data: any | null;
+  data: CambioData[] | null;
   errorGenerico: string;
+}
+export interface CambioData {
+  campo: string;
+  valor: string;
+  valorNuevo: string;
+  visible?: boolean; // opcional
+  valorAnterior?: any; // opcional, para mostrar el valor anterior en caso de cambios
 }
 
 // Interfaz para los datos del objeto "operacion"
@@ -66,7 +73,7 @@ export interface OperacionData {
 // Interfaz principal para cada elemento del array
 export interface StorageResponse {
   excel: ExcelData;
-  antes: AntesData[];
+  antes: AntesData[]
   operacion: OperacionData;
 }
 

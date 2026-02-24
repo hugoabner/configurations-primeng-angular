@@ -12,81 +12,40 @@
       scrollHeight="530px"
       [showGridlines]="true"
       [value]="history_polizas()"
-      dataKey="TIPODOC"
+      dataKey="excel.TIPODOC"
       [rows]="10"
       [rowsPerPageOptions]="[10, 15, 25, 50]"
       [loading]="loading"
       [paginator]="true"
-      [globalFilterFields]="['DOCUMENTO', 'ASEGURADO', 'CONTRATANTE', 'ENDOSATARIO']"
+      [globalFilterFields]="['excel.TIPODOC', 'excel.DOCUMENTO', 'excel.ASEGURADO', 'excel.CONTRATANTE', 'excel.ENDOSATARIO']"
       [tableStyle]="{ 'min-width': '75rem' }"
     >
       <!-- Caption -->
       <ng-template #caption>
         <div class="flex items-center justify-end gap-4">
-          <div class="card flex justify-center">
-            <p-button
-              pTooltip="Historial de importacion de Polizas"
-              icon="pi pi-history"
-              [raised]="true"
-              severity="info"
-              tooltipPosition="bottom"
-              size="small"
-              (click)="onHistoryClick($event, op)"
-            />
-            <p-popover #op>
-              <div
-                class="flex flex-col gap-4 p-2 overflow-hidden"
-                style="max-width: 296px; min-height: 500px"
-              >
-                <div>
-                  <span class="font-medium text-surface-900 dark:text-surface-0 block mb-2">
-                    📦 Procesamiento batch
-                  </span>
-                  <p class="text-sm text-muted-color">
-                    Aquí puede ver el historial de importaciones de pólizas.
-                  </p>
-                </div>
-                @if (loadingHistory()) {
-                  <div class="flex flex-col gap-1 overflow-auto pr-2" style="max-height: 400px">
-                    @for (i of [1, 2, 3, 4, 5, 6]; track i) {
-                      <p-skeleton height="6rem" class="mb-2" />
-                    }
-                  </div>
-                } @else {
-                  <div class="flex flex-col gap-1 overflow-auto pr-2 max-h-125">
-                    @for (batch of importBatchHistory; track batch.id) {
-                      <div
-                        (click)="loadBatchDetail(batch)"
-                        class="flex p-2 rounded-md cursor-pointer hover:bg-surface-100 dark:hover:bg-surface-700 transition-colors duration-200 gap-3 items-center"
-                      >
-                        <div class="shrink-0">
-                          <i
-                            class="pi"
-                            [ngClass]="
-                              batch.status === 'FINALIZADO'
-                                ? 'pi-check-circle text-green-500'
-                                : 'pi-exclamation-circle text-red-500'
-                            "
-                            style="font-size: 1.5rem"
-                          ></i>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                          <div class="flex items-center gap-2">
-                            <span class="font-semibold text-lg truncate">{{ batch.fileName }}</span>
-                          </div>
-                          <div class="text-sm text-muted-color">
-                            <span>Total: {{ batch.stats.total }}</span>
-                          </div>
-                        </div>
-                      </div>
-                    } @empty {
-                      <div class="p-8 text-center text-muted-color">No hay batches disponibles</div>
-                    }
-                  </div>
-                }
-              </div>
-            </p-popover>
-          </div>
+          <p-button
+            pTooltip="Importar Polizas"
+            icon="pi pi-upload"
+            [raised]="true"
+            severity="success"
+            tooltipPosition="bottom"
+            size="small"
+            (click)="fileInput.click()"
+          />
+          <input 
+            type="file"
+            accept=".xlsx"
+            class="hidden"
+            #fileInput
+            (change)="onFileSelected($event)"
+          >
+            <!-- (click)="loadHistory()" -->
+          <app-batch-history-popover
+            [loading]="loadingHistory()"
+            [importBatchHistory]="importBatchHistory()"
+            (requestHistory)="loadHistory()"
+            (batchSelected)="onBatchSelected($event)"
+          />
           <p-button
             pTooltip="Ver actualizacion de Polizas"
             icon="pi pi-eye"
@@ -94,7 +53,8 @@
             severity="info"
             tooltipPosition="bottom"
             size="small"
-          />
+            (click)="viewPolizas(dt2._value)"
+            />
           <p-button
             pTooltip="Exportar a Excel"
             icon="pi pi-download"
@@ -122,7 +82,7 @@
               pInputText
               type="text"
               (input)="dt2.filterGlobal($event.target.value, 'contains')"
-              placeholder="Search keyword"
+              placeholder="Buscar ..."
             />
             <!-- (input.debounce.5000)="onSearch($event.target.value)" -->
           </p-iconfield>
@@ -140,19 +100,18 @@
         <tr>
           @for (col of columns; track col.field) {
             <th style="width: auto; min-width: 8rem">
-              @if (col.field === 'TIPODOC') {
-                <p-columnFilter field="TIPODOC" matchMode="in" [showMenu]="false">
+              @if (col.filterType === 'multiselect') {
+                <p-columnFilter [field]="col.field" matchMode="in" [showMenu]="false">
                   <ng-template pTemplate="filter" let-value let-filter="filterCallback">
                     <p-multiSelect
                       [ngModel]="value"
-                      [options]="documentOptions"
-                      placeholder="Documento"
+                      [options]="filterOptions()[col.field] || []"
+                      placeholder="Filtrar"
                       (onChange)="filter($event.value)"
                       optionLabel="name"
                       optionValue="value"
                       appendTo="body"
                       display="chip"
-                      style="min-width: 2rem"
                       [panelStyle]="{ minWidth: '2rem' }"
                     >
                       <ng-template let-option pTemplate="item">
@@ -165,11 +124,11 @@
                 </p-columnFilter>
               } @else {
                 <p-columnFilter
-                  class="z-0 "
+                  class="z-0"
                   type="text"
-                  field="{{ col.field }}"
-                  placeholder="Type to search"
-                  ariaLabel="Filter Name"
+                  [field]="col.field"
+                  placeholder="Buscar..."
+                  ariaLabel="Buscar en {{ col.header }}"
                   filterOn="input"
                 ></p-columnFilter>
               }
@@ -180,12 +139,9 @@
       <!-- Body -->
       <ng-template #body let-poliza let-columns="columns">
         <tr>
-          @for (col of columns; track col.field) {
+           @for (col of columns; track col.field) {
             <td>
-              <!-- @if (col.field === 'ENDOSATARIO') {
-                {{ poliza[col.field] | titlecase }}
-              } -->
-              {{ poliza[col.field] || '-' }}
+              {{ getNestedValue(poliza, col.field) || '-' }}
             </td>
           }
         </tr>
@@ -193,7 +149,7 @@
       <!-- Empty Message -->
       <ng-template #emptymessage>
         <tr>
-          <td colspan="35" class="text-center text-2xl">No se encontraron registros</td>
+          <td colspan="43" class="text-center text-2xl">No se encontraron registros</td>
         </tr>
       </ng-template>
       <!-- paginator  left  -->

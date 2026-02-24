@@ -59,3 +59,11 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
 
 npm install primeng @primeuix/themes
+## View structured files the project 
+
+Al ejecutar este comando podra verificar toda la estructura de carpetas del proyecto en su terminal
+
+```bash
+tree .\src\app /F
+```
+Es un comando de bastante ayuda para poder ver su proyecto desde una cosmovision diferente 

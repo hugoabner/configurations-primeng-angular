@@ -1,21 +1,19 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { map, Observable, of, switchMap, tap } from 'rxjs';
-import * as XLSX from 'xlsx';
 import { environment } from '../../../../environments/environment.development';
 import { API_ENDPOINTS } from '../../constants/api-endpoint-constants';
 import {
   BatchHistoryItem,
-  ExcelData,
   StorageObject,
   StorageObjects,
   StorageResponse,
 } from '../../interfaces/interface-storage';
 import { AuthService } from '../auth-service/auth-service';
 interface GenerateUrlResponse {
-    mensaje: string
-    url: string
-  }
+  mensaje: string;
+  url: string;
+}
 @Injectable({
   providedIn: 'root',
 })
@@ -31,7 +29,7 @@ export class BucketService {
   public history = this._history.asReadonly();
 
   public lastLoaded = signal<Date | null>(null);
-  private cacheDuration = 1 * 60 * 1000;
+  private cacheDuration = 2 * 60 * 1000;
 
   private isCacheValid(): boolean {
     const last = this.lastLoaded();
@@ -39,7 +37,7 @@ export class BucketService {
     return new Date().getTime() - last.getTime() < this.cacheDuration;
   }
 
-  public getImportBatchDetail(name: string, cache: boolean = false): Observable<ExcelData[]> {
+  public getImportBatchDetail(name: string, cache: boolean = false): Observable<StorageResponse[]> {
     return this._authService.getGoogleToken().pipe(
       switchMap((googleToken) => {
         const headers = new HttpHeaders().set('Authorization', `Bearer ${googleToken}`);
@@ -47,15 +45,7 @@ export class BucketService {
         const url = `${this.GCS_BUCKET_URL}/${API_ENDPOINTS.STORAGE_BUCKET.IMPORT_BATCH_DETAIL}/${name}?alt=media${versionParam}`;
         return this._http.get<StorageResponse[]>(url, { headers });
       }),
-      map((response) => this.processData(response)),
     );
-  }
-
-  private processData(data: StorageResponse[]): ExcelData[] {
-    return data.map((item) => {
-      const ex = item.excel;
-      return { ...ex };
-    });
   }
 
   public getImportBatchHistory(forceRefresh: boolean = false): Observable<BatchHistoryItem[]> {
@@ -70,7 +60,12 @@ export class BucketService {
           { headers },
         );
       }),
-      map((response) => response.items.map((item) => this.mapStorageToBatchItem(item))),
+      // debe devolver ordenado de forma descendente por el campo timeCreated
+      map((response) =>
+        response.items
+          .map((item) => this.mapStorageToBatchItem(item))
+          .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()),
+      ),
       tap((data) => {
         // 3. Efecto secundario para actualizar el estado privado
         this._history.set(data);
@@ -101,28 +96,23 @@ export class BucketService {
     };
   }
 
-  public exportToExcel(data: any[], fileName: string): void {
-    const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(data);
-    const workbook: XLSX.WorkBook = {
-      Sheets: { Datos: worksheet },
-      SheetNames: ['Datos'],
-    };
-    XLSX.writeFile(workbook, `${fileName}.xlsx`);
-  }
-
   public generateUrl(url: string): Observable<GenerateUrlResponse> {
     if (!url) return of({ mensaje: 'No se pudo generar la URL', url: '' });
     // metodo post enviar en el body el url y recibir el signedUrl
     return this._authService.getKarlosToken().pipe(
       switchMap((karlosToken) => {
-          const headers = new HttpHeaders().set('X-Auth-Token', karlosToken);
+        const headers = new HttpHeaders().set('X-Auth-Token', karlosToken);
         return this._http.post<GenerateUrlResponse>(
           `${this.API_URL}/utilitarios/google/generateSignedUrl`,
-          { fileName: url  },
+          { fileName: url },
           { headers },
         );
       }),
       map((response) => response),
     );
+  }
+
+  public saveFileExcel(path: string, file_name: string) {
+
   }
 }
