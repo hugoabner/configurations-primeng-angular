@@ -19,23 +19,12 @@ import { ToastModule } from 'primeng/toast';
 import { Tooltip } from 'primeng/tooltip';
 import { finalize } from 'rxjs';
 import { environment } from '../../../../../environments/environment.development';
-import {
-  AntesData,
-  BatchHistoryItem,
-  CambioData,
-  StorageResponse,
-} from '../../../../core/interfaces/interface-storage';
-import { ExcelService } from '../../../../core/services';
-import { BucketService } from '../../../../core/services/bucket-service/bucket-service';
+import { AntesData, BatchHistoryItem, CambioData, StorageResponse } from '../../../../core';
+import { BucketService, ExcelService } from '../../../../core/services';
 import { BatchHistoryPopover } from '../components/batch-history-popover/batch-history-popover';
 import { COLUMNS_STORAGE_TABLE } from '../constants/poliza-constants';
-import { PolizaViewRow } from '../interfaces/poliza-import-interface';
+import { Column, PolizaViewRow } from '../interfaces/poliza-import-interface';
 
-interface Column {
-  field: string;
-  header: string;
-  filterType?: string;
-}
 @Component({
   selector: 'app-poliza',
   imports: [
@@ -61,11 +50,11 @@ interface Column {
   providers: [MessageService, PopoverModule],
 })
 export class Poliza implements OnInit {
-  private _activatedRoute = inject(ActivatedRoute);
-  private _bucketService = inject(BucketService);
-  private _messageService = inject(MessageService);
-  private _router = inject(Router);
-  private _excelService = inject(ExcelService);
+  private readonly _messageService = inject(MessageService);
+  private readonly _activatedRoute = inject(ActivatedRoute);
+  private readonly _bucketService = inject(BucketService);
+  private readonly _router = inject(Router);
+  private readonly _excelService = inject(ExcelService);
 
   constructor() {}
 
@@ -74,6 +63,9 @@ export class Poliza implements OnInit {
   loading: boolean = true;
   cols: Column[] = COLUMNS_STORAGE_TABLE;
   selectedColumns: Column[] = COLUMNS_STORAGE_TABLE;
+
+  importBatchHistory = signal<BatchHistoryItem[]>([]);
+  loadingHistory = signal<boolean>(false);
 
   ngOnInit() {
     this._activatedRoute.queryParams.subscribe((params) => {
@@ -113,9 +105,6 @@ export class Poliza implements OnInit {
   /**
    * Button Historial de importacion de Polizas
    */
-  importBatchHistory = signal<BatchHistoryItem[]>([]);
-  loadingHistory = signal<boolean>(false);
-
   public loadHistory() {
     this.loadingHistory.set(true);
     this._bucketService
@@ -290,12 +279,12 @@ export class Poliza implements OnInit {
     const formattedData: PolizaViewRow[] = this.processPolizasToView(polizas);
     // generar excel con formattedData
     formattedData.map((row) => ({
-        CAMPO: row.campo,
-        NROPOLIZA: row.nroPoliza,
-        NRORENOVACION: row.nroRenovacion,
-        TIPO: row.tipo,
-        VALORANTERIOR: row.valorAnterior,
-        VALORNUEVO: row.valorNuevo
+      CAMPO: row.campo,
+      NROPOLIZA: row.nroPoliza,
+      NRORENOVACION: row.nroRenovacion,
+      TIPO: row.tipo,
+      VALORANTERIOR: row.valorAnterior,
+      VALORNUEVO: row.valorNuevo,
     }));
     this._excelService.exportAsExcelFileAsync(formattedData, 'Polizas').subscribe({
       next: (blob) => {
@@ -303,8 +292,8 @@ export class Poliza implements OnInit {
         // enviar el filename `HISTORIAL_${nameHistory}.xlsx`
         // enviar el blob
         // enviar el metadata
-        // mensaje 
-        this.showWarning('Funcionalidad en desarrollo.'); 
+        // mensaje
+        this.showWarning('Funcionalidad en desarrollo.');
       },
       error: (err) => {
         this._messageService.add({
@@ -312,30 +301,34 @@ export class Poliza implements OnInit {
           summary: 'Error',
           detail: 'No se pudo generar el archivo Excel de pólizas',
         });
-      }
-    })
+      },
+    });
   }
 
   private processPolizasToView(polizas: StorageResponse[]): PolizaViewRow[] {
     return polizas.flatMap((p: StorageResponse) => {
       const nroRenovacion = Number(p.excel['NRO RENOVACION']);
       const nroPoliza = p.excel['NRO POLIZA'];
-      return p.antes.flatMap((cambio: AntesData) => {
-        // Regra 1: Ignorar tipos especificos
-        if (['SIN_CAMBIOS', 'ELIMINACION'].includes(cambio.tipo)) return [];
-        // Regra 2: Mapear campos iniciales (Diferencias generales sin sub-items)
-        const isInitialInsertion = cambio.tipo === 'INSERCION' && nroRenovacion === 0;
-        if (isInitialInsertion || !cambio.data?.length) {
-          return [this.createViewRow(nroPoliza, nroRenovacion, cambio.tipo)];
-        }
-        // Regra 3: Mapear sub-itens (Diferencias específicas por campo)
-        return cambio.data
-          .filter((sub: CambioData) => sub.visible !== false) // Filtrar campos que no sean visibles
-          .map((sub: CambioData) => this.createViewRow(nroPoliza, nroRenovacion, cambio.tipo, sub));
-      });
+      return (
+        p.antes?.flatMap((cambio: AntesData) => {
+          // Regra 1: Ignorar tipos especificos
+          if (['SIN_CAMBIOS', 'ELIMINACION'].includes(cambio.tipo)) return [];
+          // Regra 2: Mapear campos iniciales (Diferencias generales sin sub-items)
+          const isInitialInsertion = cambio.tipo === 'INSERCION' && nroRenovacion === 0;
+          if (isInitialInsertion || !cambio.data?.length) {
+            return [this.createViewRow(nroPoliza, nroRenovacion, cambio.tipo)];
+          }
+          // Regra 3: Mapear sub-itens (Diferencias específicas por campo)
+          return cambio.data
+            .filter((sub: CambioData) => sub.visible !== false) // Filtrar campos que no sean visibles
+            .map((sub: CambioData) =>
+              this.createViewRow(nroPoliza, nroRenovacion, cambio.tipo, sub),
+            );
+        }) ?? []
+      );
     });
   }
-  
+
   private createViewRow(
     nroPoliza: string,
     nroRenovacion: string | number,
@@ -352,10 +345,9 @@ export class Poliza implements OnInit {
     };
   }
 
-
   /**
-   * 
-   * @param message 
+   *
+   * @param message
    */
   public async onFileSelected(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
@@ -372,7 +364,57 @@ export class Poliza implements OnInit {
       queryParamsHandling: 'merge',
     });
     const datosExcel = await this._excelService.excelToJson<any>(file);
-    console.log("datos de excel", datosExcel);
+    const dataToExport: StorageResponse[] = datosExcel.map((item) => ({
+      excel: {
+        TIPODOC: item.Tipo_Doc, // Asume que estas son tus keys en ExcelData
+        DOCUMENTO: item.Nro_Doc,
+        ASEGURADO: item.Asegurado,
+        CONTRATANTE: item.Beneficiario,
+        ENDOSATARIO: item.Nro_Móvil_1,
+        TELEFONO: item.Nro_Móvil_1,
+        CORREO: item.Cliente_Correo,
+        'NRO POLIZA': item.Póliza,
+        'ESTADO RENOVACION': item.Estado_Renov,
+        'ESTADO EMISION': item.Estado,
+        'SUB ESTADO': item.Sub_estado,
+        'NRO RENOVACION': item.Renov,
+        'NRO VEHICULO': item['#'],
+        USUARIO: item.Responsable,
+        'FECHA INICIO DE VIG': item.FInicio,
+        'FECHA FIN DE VIG': item.FFinal,
+        'CIA SEGUROS': item.Cia_Seguros,
+        PRODUCTO: item.Producto,
+        'GPS OBLIGATORIO': item.GPS_Obligatorio,
+        COBERTURA: '', //=> no se encontro columna en la tabla
+        USO: item.Tipo_de_Uso,
+        CLASE: item.Clase,
+        'TIENE GPS': item.Posee_GPS,
+        MARCA: item.Marca,
+        MODELO: item.Modelo,
+        ANIO: item.Año,
+        PLACA: item.Placa,
+        TIMON: item.Timón,
+        COLOR: item.Color,
+        'NRO MOTOR': item.NroMotor,
+        'NRO CHASIS': item.NroChasis,
+        'SUM ASEG': item.Suma_Asegurada,
+        // 'FORMA PAGO': '',
+        // 'NRO CUOTAS': '',
+        // 'IMPORTE CUOTAS': '',
+        'TIPO MONEDA': item.Moneda,
+        'PRIMA NETA': item.Prima_Neta,
+        TASA: item.Tasa_Aplicada,
+        'FECHA ALERTA': item.FAlerta,
+        descPlanFinanciamiento: '',
+        formaPago: '',
+        id: '',
+        importeCuotas: item.importeCuotas,
+        nroCuotas: item.nroCuotas,
+      },
+    }));
+    // asignar ala tabla
+    console.log(JSON.stringify(dataToExport, null, 2));
+    this.history_polizas.set(dataToExport);
   }
 
   private showWarning(message: string): void {

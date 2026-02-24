@@ -73,8 +73,8 @@ export interface OperacionData {
 // Interfaz principal para cada elemento del array
 export interface StorageResponse {
   excel: ExcelData;
-  antes: AntesData[]
-  operacion: OperacionData;
+  antes?: AntesData[]
+  operacion?: OperacionData;
 }
 
 

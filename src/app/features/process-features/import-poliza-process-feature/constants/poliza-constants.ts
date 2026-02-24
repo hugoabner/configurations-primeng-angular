@@ -1,15 +1,11 @@
-interface Column {
-    field: string;
-    header: string;
-    filterType?: string; // Agregamos un nuevo atributo para el tipo de filtro
-}
+import { Column } from "../interfaces/poliza-import-interface";
 
 export const COLUMNS_STORAGE_TABLE: Column[] = [
-  { field: 'excel.TIPODOC', header: 'Tipo de Doc.', filterType: 'multiselect' }, 
-  { field: 'excel.DOCUMENTO', header: 'Número de Documento', filterType: 'text' }, 
-  { field: 'excel.ASEGURADO', header: 'Nombre Completo', filterType: 'text' }, 
-  { field: 'excel.CONTRATANTE', header: 'Contratante', filterType: 'text' }, 
-  { field: 'excel.ENDOSATARIO', header: 'Endosatario', filterType: 'text' }, 
+  { field: 'excel.TIPODOC', header: 'TIPODOC', filterType: 'multiselect' }, 
+  { field: 'excel.DOCUMENTO', header: 'DOCUMENTO', filterType: 'text' }, 
+  { field: 'excel.ASEGURADO', header: 'ASEGURADO', filterType: 'text' }, 
+  { field: 'excel.CONTRATANTE', header: 'CONTRATANTE', filterType: 'text' }, 
+  { field: 'excel.ENDOSATARIO', header: 'ENDOSATARIO', filterType: 'text' }, 
   { field: 'excel.TELEFONO', header: 'Teléfono', filterType: 'text' }, 
   { field: 'excel.CORREO', header: 'Correo Electrónico', filterType: 'text' }, 
   { field: 'excel.NRO POLIZA', header: 'Número de Póliza', filterType: 'text' }, 
